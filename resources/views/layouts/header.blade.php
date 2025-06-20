@@ -12,7 +12,7 @@
              </a>
 
              <div class="d-none d-md-none d-lg-block p-2">
-                 Sistem Pengambilan Keputusan
+                 Sistem Pendukung Keputusan
              </div>
              <!--Navbar nav -->
              <ul class="navbar-nav navbar-right-wrap ms-lg-auto d-flex nav-top-wrap align-items-center ms-4 ms-lg-0">

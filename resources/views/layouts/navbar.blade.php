@@ -33,11 +33,33 @@
                     <li class="nav-link {{ Request::is('nilai*') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/nilai') }}">Kelola Penilaian</a>
                     </li>
-                    <li class="nav-link {{ Request::is('lihatPerhitungan') ? 'active fw-bold' : '' }}">
+
+                    <!-- Tetap tampilkan menu Lihat Perhitungan -->
+                    <!-- <li class="nav-link {{ Request::is('lihatPerhitungan') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/lihatPerhitungan') }}">Lihat Perhitungan</a>
+                    </li> -->
+
+                    <!-- Tambahan dropdown baru -->
+                    <li class="nav-item dropdown ">
+                        <a class="nav-link dropdown-toggle {{ Request::is('lihatPerhitungan*') ? 'active fw-bold' : '' }}" href="#" id="navbarPerhitungan" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Lihat Perhitungan
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarPerhitungan">
+                            <li>
+                                <a class="dropdown-item" href="{{ url('/lihatPerhitungan') }}">
+                                    Lolos
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url('/lihatPerhitungan/eliminasi') }}">
+                                    Tereliminasi
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
+
         </nav>
     </div>
 </div>

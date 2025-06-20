@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<title>Edit Penilaian | Sistem Pengambilan Keputusan</title>
+<title>Edit Penilaian | Sistem Pendukung Keputusan</title>
 
 @section('content')
 <div id="app-content">
@@ -9,15 +9,15 @@
 
             <!-- Notifikasi Inputan Salah -->
             @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Terjadi kesalahan:</strong>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Terjadi kesalahan:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
             @endif
 
             <!-- Auto close alert setelah 5 detik -->
@@ -39,7 +39,7 @@
                             <h3 class="mb-0 text-white">Edit Penilaian</h3>
                         </div>
                         <div>
-                            <a href="/nilai" class="btn btn-secondary">Kembali</a>
+                            <a href="/nilai" class="btn btn-light btn-secondary">Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -55,37 +55,38 @@
                                 @method('PUT')
 
                                 <!-- Tendik -->
-                                <div class="col-md-6">
-                                    <label for="tendik_id" class="form-label">Nama Tendik</label>
-                                    <select name="tendik_id" id="tendik_id" class="form-select" required>
+                                <div class="col-md-5">
+                                    <label for="tendik_nik" class="form-label">Nama Tendik</label>
+                                    <select name="tendik_nik" id="tendik_nik" class="form-select" required>
                                         <option disabled value="">-- Pilih Tendik --</option>
                                         @foreach($tendiks as $tendik)
-                                            <option value="{{ $tendik->id }}" {{ $data->tendik_id == $tendik->id ? 'selected' : '' }}>
-                                                {{ $tendik->nama }}
-                                            </option>
+                                        <option value="{{ $tendik->nik }}" {{ $data->tendik_nik == $tendik->nik ? 'selected' : '' }}>
+                                            {{ $tendik->nama }}
+                                        </option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">Pilih tendik.</div>
                                 </div>
 
                                 <!-- Kriteria -->
-                                <div class="col-md-6">
-                                    <label for="kriteria_id" class="form-label">Nama Kriteria</label>
-                                    <select name="kriteria_id" id="kriteria_id" class="form-select" required>
+                                <div class="col-md-5">
+                                    <label for="kode_kriteria" class="form-label">Nama Kriteria</label>
+                                    <select name="kode_kriteria" id="kode_kriteria" class="form-select" required>
                                         <option disabled value="">-- Pilih Kriteria --</option>
                                         @foreach($kriterias as $kriteria)
-                                            <option value="{{ $kriteria->id }}" {{ $data->kriteria_id == $kriteria->id ? 'selected' : '' }}>
-                                                {{ $kriteria->nama }}
-                                            </option>
+                                        <option value="{{ $kriteria->kode_kriteria }}" {{ $data->kode_kriteria == $kriteria->kode_kriteria ? 'selected' : '' }}>
+                                            {{ $kriteria->nama }}
+                                        </option>
                                         @endforeach
                                     </select>
                                     <div class="invalid-feedback">Pilih kriteria.</div>
                                 </div>
 
+
                                 <!-- Nilai -->
-                                <div class="col-md-6">
+                                <div class="col-md-2">
                                     <label for="value" class="form-label">Nilai</label>
-                                    <input type="number" class="form-control" id="value" name="value" min="0" step="0.01" value="{{ $data->value }}" placeholder="Contoh: 0 - 100"  required>
+                                    <input type="number" class="form-control" id="value" name="value" min="0" step="0.01" value="{{ $data->value }}" placeholder="Contoh: 0 - 100" required>
                                     <div class="invalid-feedback">Masukkan nilai.</div>
                                 </div>
 
@@ -100,5 +101,5 @@
             </div>
         </div>
     </div>
-</div>    
+</div>
 @endsection

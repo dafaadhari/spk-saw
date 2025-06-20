@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('hasils', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tendik_id');
+            $table->char('tendik_nik', 16);
+
             $table->float('final_hasil');
             $table->integer('rank');
             $table->timestamps();
 
-            $table->foreign('tendik_id')->references('id')->on('tendiks')->onDelete('cascade');
+            $table->foreign('tendik_nik')->references('nik')->on('tendiks')->onDelete('cascade');
         });
     }
 

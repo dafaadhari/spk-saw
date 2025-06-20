@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Sistem Pengambilan Keputusan') }}</title>
+        <title>{{ config('app.name', 'Sistem Pendukung Keputusan') }}</title>
 
         <!-- Favicon -->
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('template-dash/assets/images/logo.webp') }}" />

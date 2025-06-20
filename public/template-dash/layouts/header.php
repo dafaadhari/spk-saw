@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <title>Dashboard | Sistem Pengambilan Keputusan</title>
+    <title>Dashboard | Sistem Pendukung Keputusan</title>
 </head>
 
 <body>
@@ -61,7 +61,7 @@
                     </a>
 
                     <div class="d-none d-md-none d-lg-block p-2">
-                        Sistem Pengambilan Keputusan
+                        Sistem Pendukung Keputusan
                     </div>
                     <!--Navbar nav -->
                     <ul class="navbar-nav navbar-right-wrap ms-lg-auto d-flex nav-top-wrap align-items-center ms-4 ms-lg-0">

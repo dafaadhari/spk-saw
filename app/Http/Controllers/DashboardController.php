@@ -22,11 +22,11 @@ class DashboardController extends Controller
         $perhitunganCount = Hasil::count();
 
         // Group per rank
-    $rankCounts = Hasil::select('rank')
-        ->selectRaw('COUNT(*) as total')
-        ->groupBy('rank')
-        ->orderBy('rank')
-        ->get();
+        $rankCounts = Hasil::with('tendik')
+            ->orderBy('rank', 'asc')
+            ->take(5)
+            ->get();
+
 
         // Kirim data ke view 'dashboard'
         return view('dashboard', compact(

@@ -35,20 +35,23 @@ class KriteriaController extends Controller
     public function save(Request $request)
     {
         $validated = $request->validate([
+            'kode_kriteria' => 'required|string|max:35|unique:kriterias,kode_kriteria',
             'nama_kriteria' => 'required|string|max:255',
             'bobot' => 'required|numeric|min:0|max:1',
-            'sumber' => 'required',
+            'sumber' => 'required|string|max:255',
         ], [
+            'kode_kriteria.required' => 'Kode kriteria wajib diisi.',
+            'kode_kriteria.unique' => 'Kode kriteria sudah digunakan.',
             'nama_kriteria.required' => 'Nama kriteria wajib diisi.',
             'bobot.required' => 'Bobot wajib diisi.',
             'bobot.numeric' => 'Bobot harus berupa angka.',
             'bobot.min' => 'Bobot tidak boleh kurang dari 0.',
             'bobot.max' => 'Bobot tidak boleh lebih dari 1.',
-            'sumber.required' => 'Sumber wajib dipilih.',
-            'sumber.in' => 'Sumber harus di isi',
+            'sumber.required' => 'Sumber wajib diisi.',
         ]);
 
         $this->kriteria->create([
+            'kode_kriteria' => $validated['kode_kriteria'],
             'nama' => $validated['nama_kriteria'],
             'weight' => $validated['bobot'],
             'sumber' => $validated['sumber'],
@@ -57,29 +60,28 @@ class KriteriaController extends Controller
         return redirect('/kriteria')->with('success', 'Kriteria berhasil disimpan.');
     }
 
-    public function edit($id)
+    public function edit($kode_kriteria)
     {
-        $kriteria = $this->kriteria->findOrFail($id);
+        $kriteria = $this->kriteria->where('kode_kriteria', $kode_kriteria)->firstOrFail();
         return view('KelolaBobotKriteria.formedit', compact('kriteria'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $kode_kriteria)
     {
         $validated = $request->validate([
             'nama_kriteria' => 'required|string|max:255',
             'bobot' => 'required|numeric|min:0|max:1',
-            'sumber' => 'required',
-        ],[
+            'sumber' => 'required|string|max:255',
+        ], [
             'nama_kriteria.required' => 'Nama kriteria wajib diisi.',
             'bobot.required' => 'Bobot wajib diisi.',
             'bobot.numeric' => 'Bobot harus berupa angka.',
             'bobot.min' => 'Bobot tidak boleh kurang dari 0.',
             'bobot.max' => 'Bobot tidak boleh lebih dari 1.',
-            'sumber.required' => 'Sumber wajib dipilih.',
-            'sumber.in' => 'Sumber harus di isi',
+            'sumber.required' => 'Sumber wajib diisi.',
         ]);
 
-        $kriteria = $this->kriteria->findOrFail($id);
+        $kriteria = $this->kriteria->where('kode_kriteria', $kode_kriteria)->firstOrFail();
         $kriteria->update([
             'nama' => $validated['nama_kriteria'],
             'weight' => $validated['bobot'],
@@ -88,12 +90,13 @@ class KriteriaController extends Controller
 
         return redirect('/kriteria')->with('success', 'Kriteria berhasil diperbarui.');
     }
-    public function delete($id)
+
+    public function delete($kode_kriteria)
     {
-        $kriteria = Kriteria::findOrFail($id);
+        $kriteria = $this->kriteria->where('kode_kriteria', $kode_kriteria)->firstOrFail();
         $kriteria->delete();
 
-        return redirect()->route('KelolaBobotKriteria.index')->with('success', 'Kriteria berhasil dihapus.');
+        return redirect('/kriteria')->with('success', 'Kriteria berhasil dihapus.');
     }
 
     public function indexExcel()
@@ -117,20 +120,26 @@ class KriteriaController extends Controller
         foreach ($sheet as $index => $row) {
             if ($index === 0) continue; // Skip header
 
-            $nama = trim($row[0]);
-            $weight = $row[1];
-            $sumber = $row[2];
+            $kode = trim($row[0] ?? '');
+            $nama = trim($row[1] ?? '');
+            $weight = trim($row[2] ?? '');
+            $sumber = trim($row[3] ?? '');
 
-            // Cek jika nama sudah ada di database
-            $exists = DB::table('kriterias')->where('nama', $nama)->exists();
-
-            if ($exists) {
-                $errors[] = "Baris " . ($index + 1) . ": Nama kriteria \"$nama\" sudah ada.";
+            if ($kode === '' || $nama === '' || !is_numeric($weight) || $sumber === '') {
+                $errors[] = "Baris " . ($index + 1) . ": Data tidak lengkap atau tidak valid.";
                 continue;
             }
 
-            // Insert data
+
+            // Cek jika kode_kriteria sudah ada
+            $exists = DB::table('kriterias')->where('kode_kriteria', $kode)->exists();
+            if ($exists) {
+                $errors[] = "Baris " . ($index + 1) . ": Kode kriteria \"$kode\" sudah ada.";
+                continue;
+            }
+
             Kriteria::create([
+                'kode_kriteria' => $kode,
                 'nama' => $nama,
                 'weight' => $weight,
                 'sumber' => $sumber,
@@ -141,12 +150,11 @@ class KriteriaController extends Controller
             $inserted++;
         }
 
-        // Jika ada error, tampilkan semua
         if (!empty($errors)) {
-            return redirect()->back()->withErrors($errors)->with('success', "$inserted data berhasil diimport, " . count($errors) . " duplikat diabaikan.");
+            return redirect()->back()->withErrors($errors)->with('success', "$inserted data berhasil diimport, " . count($errors) . " duplikat/invalid diabaikan.");
         }
 
-        return redirect()->route('import.indexExcel')->with('success', 'Data berhasil diimport!');
+        return redirect()->route('import.indexExcel')->with('success', 'Semua data berhasil diimport!');
     }
 
     public function export()
@@ -157,20 +165,22 @@ class KriteriaController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
 
         // Header
-        $sheet->setCellValue('A1', 'Nama');
-        $sheet->setCellValue('B1', 'Bobot');
-        $sheet->setCellValue('C1', 'Sumber');
+        $sheet->setCellValue('A1', 'kode_kriteria');
+        $sheet->setCellValue('B1', 'nama');
+        $sheet->setCellValue('C1', 'bobot');
+        $sheet->setCellValue('D1', 'sumber');
 
         // Data
         $row = 2;
         foreach ($kriterias as $kriteria) {
-            $sheet->setCellValue("A{$row}", $kriteria->nama);
-            $sheet->setCellValue("B{$row}", $kriteria->weight);
-            $sheet->setCellValue("C{$row}", $kriteria->sumber);
+            $sheet->setCellValue("A{$row}", $kriteria->kode_kriteria);
+            $sheet->setCellValue("B{$row}", $kriteria->nama);
+            $sheet->setCellValue("C{$row}", $kriteria->weight);
+            $sheet->setCellValue("D{$row}", $kriteria->sumber);
             $row++;
         }
 
-        // Buat file dan download
+        // Buat file dan kirim ke browser
         $writer = new Xlsx($spreadsheet);
         $fileName = 'data_kriteria.xlsx';
         $tempFile = tempnam(sys_get_temp_dir(), $fileName);

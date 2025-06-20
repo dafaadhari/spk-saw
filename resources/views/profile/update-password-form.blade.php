@@ -1,8 +1,7 @@
 <form wire:submit.prevent="updatePassword">
     <!-- Judul dan Deskripsi -->
     <div class="mb-4">
-        <h5 class="mb-1">{{ __('Update Password') }}</h5>
-        <p class="text-muted">{{ __('Ensure your account is using a long, random password to stay secure.') }}</p>
+        <p class="text-muted">{{ __('Pastikan akun Anda menggunakan kata sandi yang panjang dan acak agar tetap aman.') }}</p>
     </div>
 
     <div class="row g-3">
@@ -41,12 +40,12 @@
     <div class="d-flex justify-content-end align-items-center gap-3 mt-4">
         <!-- Pesan sukses -->
         <x-action-message class="text-success small" on="saved">
-            {{ __('Saved.') }}
+            {{ __('Tersimpan.') }}
         </x-action-message>
 
         <!-- Tombol simpan -->
         <button type="submit" class="btn btn-dark" wire:loading.attr="disabled" wire:target="photo">
-            {{ __('Save') }}
+            {{ __('Simpan') }}
         </button>
     </div>
 

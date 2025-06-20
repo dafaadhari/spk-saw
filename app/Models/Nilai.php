@@ -6,15 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Nilai extends Model
 {
-    protected $fillable = ['tendik_id', 'kriteria_id', 'value'];
+    protected $fillable = ['tendik_nik', 'kode_kriteria', 'value'];
 
     public function tendik()
     {
-        return $this->belongsTo(Tendik::class);
+        return $this->belongsTo(Tendik::class, 'tendik_nik', 'nik');
     }
 
     public function kriteria()
     {
-        return $this->belongsTo(Kriteria::class);
+        return $this->belongsTo(Kriteria::class, 'kode_kriteria', 'kode_kriteria');
     }
 }
