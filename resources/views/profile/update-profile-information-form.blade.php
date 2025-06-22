@@ -2,7 +2,7 @@
     <!-- Judul -->
     <div class="mb-4">
         <h5 class="mb-1">{{ __('Profile Information') }}</h5>
-        <p class="text-muted">{{ __('Update your account\'s profile information and email address.') }}</p>
+        <p class="text-muted">{{ __('Perbarui informasi profil akun dan alamat email Anda.') }}</p>
     </div>
 
     <div class="row g-3">
@@ -56,7 +56,7 @@
 
         <!-- Name -->
         <div class="col-md-6">
-            <label for="name" class="form-label">{{ __('Name') }}</label>
+            <label for="name" class="form-label">{{ __('Nama') }}</label>
             <input id="name" type="text" class="form-control" wire:model="state.name" required autocomplete="name">
             @error('name') <div class="text-danger mt-1">{{ $message }}</div> @enderror
         </div>
@@ -69,16 +69,16 @@
 
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
             <div class="form-text mt-2">
-                {{ __('Your email address is unverified.') }}
+                {{ __('Alamat email Anda belum diverifikasi.') }}
 
                 <button type="button" class="btn btn-link p-0 align-baseline" wire:click.prevent="sendEmailVerification">
-                    {{ __('Click here to re-send the verification email.') }}
+                    {{ __('Klik di sini untuk mengirim ulang email verifikasi.') }}
                 </button>
             </div>
 
             @if ($this->verificationLinkSent)
             <div class="text-success mt-1">
-                {{ __('A new verification link has been sent to your email address.') }}
+                {{ __('Tautan verifikasi baru telah dikirim ke alamat email Anda.') }}
             </div>
             @endif
             @endif
@@ -89,12 +89,12 @@
     <div class="flex items-center justify-start gap-4 mt-6" style="text-align: end;">
         <!-- Pesan sukses -->
         <x-action-message class="text-green-600 text-sm" on="saved">
-            {{ __('Saved.') }}
+            {{ __('Tersimpan.') }}
         </x-action-message>
 
         <!-- Tombol simpan -->
         <button type="submit" class="btn btn-dark" wire:loading.attr="disabled" wire:target="photo">
-            {{ __('Save') }}
+            {{ __('Simpan') }}
         </button>
     </div>
 

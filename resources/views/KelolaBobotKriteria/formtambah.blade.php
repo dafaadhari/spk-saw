@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<title>Tambah Bobot Kriteria | Sistem Pemgambilan Keputusan</title>
+<title>Tambah Bobot Kriteria | Sistem Pendukung Keputusan</title>
 @section('content')
 
 <div id="app-content">
@@ -17,51 +17,60 @@
                         </ul>
                     </div>
                     @endif
-                    <!-- Page header -->
+
                     <div class="d-flex justify-content-between align-items-center mb-5">
                         <div class="mb-2 mb-lg-0">
-                            <h3 class="mb-0  text-white">Form Bobot Kriteria</h3>
+                            <h3 class="mb-0" style="color:white">Form Bobot Kriteria</h3>
                         </div>
                         <div>
-                            <a href="/kriteria" class="btn btn-secondary">Kembali</a>
+                            <a href="/kriteria" class="btn btn-white">Kembali</a>
                         </div>
                     </div>
                 </div>
             </div>
+
             <!-- validation -->
             <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
-                    <!-- Card -->
                     <div class="mb-10 card">
-                        <div class="tab-content p-4" id="pills-tabContent-validation">
-                            <div class="tab-pane tab-example-design fade show active" id="pills-validation-design"
-                                role="tabpanel" aria-labelledby="pills-validation-design-tab">
+                        <div class="tab-content p-4">
+                            <div class="tab-pane fade show active">
                                 <form action="{{ route('kriteria.save') }}" method="POST" class="row g-3 needs-validation" novalidate>
-                                    <!-- Nama Kriteria -->
                                     @csrf
-                                    <div class="col-md-6">
-                                        <label for="namaKriteria" class="form-label">Nama Kriteria</label>
-                                        <input type="text" class="form-control" id="namaKriteria" name="nama_kriteria" placeholder="Nama Kriteria" required>
+
+                                    <!-- Kode Kriteria -->
+                                    <div class="col-md-4">
+                                        <label for="kode_kriteria" class="form-label">Kode Kriteria</label>
+                                        <input type="text" class="form-control" id="kode_kriteria" name="kode_kriteria" required placeholder="Contoh: KR001">
+                                        <div class="invalid-feedback">
+                                            Kode kriteria wajib diisi.
+                                        </div>
+                                    </div>
+
+                                    <!-- Nama -->
+                                    <div class="col-md-4">
+                                        <label for="nama" class="form-label">Nama Kriteria</label>
+                                        <input type="text" class="form-control" id="nama" name="nama_kriteria" required placeholder="Nama Kriteria">
                                         <div class="invalid-feedback">
                                             Nama kriteria wajib diisi.
                                         </div>
                                     </div>
 
-                                    <!-- Bobot -->
-                                    <div class="col-md-3">
-                                        <label for="bobot" class="form-label">Bobot</label>
-                                        <input type="number" step="0.01" class="form-control" id="bobot" name="bobot" min="0" max="1" placeholder="Bobot" required>
+                                    <!-- Weight -->
+                                    <div class="col-md-2">
+                                        <label for="weight" class="form-label">Bobot</label>
+                                        <input type="number" step="0.01" min="0" max="1" class="form-control" id="weight" name="bobot" required placeholder="Contoh: 0.25">
                                         <div class="invalid-feedback">
                                             Masukkan nilai bobot antara 0 - 1.
                                         </div>
                                     </div>
 
-                                    <!-- sumber (Benefit/Cost) -->
-                                    <div class="col-md-3">
+                                    <!-- Sumber -->
+                                    <div class="col-md-2">
                                         <label for="sumber" class="form-label">Sumber</label>
-                                        <input type="text" class="form-control" id="sumber" name="sumber" required placeholder="Masukkan sumber (HRD,LAPORAN)." required>
+                                        <input type="text" class="form-control" id="sumber" name="sumber" required placeholder="HRD / LAPORAN">
                                         <div class="invalid-feedback">
-                                            Masukkan sumber (HRD,LAPORAN).
+                                            Sumber wajib diisi.
                                         </div>
                                     </div>
 
@@ -70,15 +79,13 @@
                                         <button class="btn btn-primary" type="submit">Simpan Kriteria</button>
                                     </div>
                                 </form>
-
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
+            <!-- validation -->
         </div>
-        <!-- validation -->
     </div>
 </div>
 

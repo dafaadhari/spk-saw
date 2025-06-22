@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<title>My Profile | Sistem Pemgambilan Keputusan</title>
+<title>My Profile | Sistem Pendukung Keputusan</title>
 @section('content')
 <div id="app-content">
 

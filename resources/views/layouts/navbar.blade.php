@@ -33,11 +33,14 @@
                     <li class="nav-link {{ Request::is('nilai*') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/nilai') }}">Kelola Penilaian</a>
                     </li>
+
+                    <!-- Tetap tampilkan menu Lihat Perhitungan -->
                     <li class="nav-link {{ Request::is('lihatPerhitungan') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/lihatPerhitungan') }}">Lihat Perhitungan</a>
-                    </li>
+                    </li> 
                 </ul>
             </div>
+
         </nav>
     </div>
 </div>

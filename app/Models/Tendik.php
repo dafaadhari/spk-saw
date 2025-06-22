@@ -6,7 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tendik extends Model
 {
-    protected $fillable = ['user_id', 'nama', 'nik', 'unit_kerja'];
+    protected $primaryKey = 'nik';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
+    protected $fillable = [
+        'user_id',
+        'nama',
+        'nik',
+        'unit_kerja',
+        'jenis_pegawai',
+        'jam_kerja_tahunan',
+        'jam_kerja_bulanan'
+    ];
 
     public function user()
     {

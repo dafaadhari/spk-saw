@@ -1,40 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Hasil Perhitungan SAW</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Laporan Hasil Perhitungan SAW</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .table th, .table td {
+                border: 1px solid #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .bg-success {
+                background-color: #198754 !important;
+                color: white !important;
+            }
+
+            .bg-warning {
+                background-color: #ffc107 !important;
+                color: black !important;
+            }
+
+            .bg-primary {
+                background-color: #0d6efd !important;
+                color: white !important;
+            }
+        }
+    </style>
 </head>
-<body class="text-sm font-sans leading-normal text-gray-900 bg-white">
+<body class="text-dark bg-white p-4">
 
-    <div class="container mx-auto px-4 py-6">
-        <h2 class="text-2xl font-bold mb-4 text-center">Laporan Hasil Perhitungan SAW</h2>
+    <h2 class="text-center fw-bold mb-4">Laporan Hasil Perhitungan SAW</h2>
 
-        <table class="w-full border border-gray-300">
-            <thead>
-                <tr class="bg-gray-100 text-left">
-                    <th class="border border-gray-300 px-2 py-1">No</th>
-                    <th class="border border-gray-300 px-2 py-1">ID Tendik</th>
-                    <th class="border border-gray-300 px-2 py-1">Nama Tendik</th>
-                    <th class="border border-gray-300 px-2 py-1">Nilai SAW</th>
-                    <th class="border border-gray-300 px-2 py-1">Ranking</th>
+    <!-- Tabel Lolos -->
+    <h5 class="fw-bold">Tendik Lolos </h5>
+    <table class="table table-bordered align-middle text-center mb-5 table-sm">
+        <thead class="table-light">
+            <tr>
+                <th>No</th>
+                <th>NIK Tendik</th>
+                <th>Nama Tendik</th>
+                <th>Nilai SAW</th>
+                <th>Ranking</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($lolos as $index => $row)
+                @php
+                    $rowClass = $row['rank'] <= 4 ? 'bg-success' : 'bg-primary';
+                @endphp
+                <tr class="{{ $rowClass }}">
+                    <td class="{{$rowClass}}">{{ $index + 1 }}</td>
+                    <td class="{{$rowClass}}">{{ $row['tendik_nik'] }}</td>
+                    <td class="{{$rowClass}}">{{ $row['nama'] }}</td>
+                    <td class="{{$rowClass}}">{{ number_format($row['nilai_akhir'], 4) }}</td>
+                    <td class="{{$rowClass}}">{{ $row['rank'] }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach ($hasil as $index => $row)
-                <tr>
-                    <td class="border border-gray-300 px-2 py-1 text-center">{{ $index + 1 }}</td>
-                    <td class="border border-gray-300 px-2 py-1 text-center">{{ 'T' . str_pad($row['tendik_id'], 3, '0', STR_PAD_LEFT) }}</td>
-                    <td class="border border-gray-300 px-2 py-1">{{ $row['nama'] }}</td>
-                    <td class="border border-gray-300 px-2 py-1 text-center">{{ number_format($row['nilai_akhir'], 4) }}</td>
-                    <td class="border border-gray-300 px-2 py-1 text-center">{{ $row['rank'] }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            @endforeach
+            @if (count($lolos) === 0)
+                <tr><td colspan="5" class="text-center">Tidak ada data.</td></tr>
+            @endif
+        </tbody>
+    </table>
 
-        <p class="mt-6 text-sm">Dicetak pada: {{ now()->format('d-m-Y H:i') }}</p>
-    </div>
+    <!-- Tabel Tereliminasi -->
+    <h5 class="fw-bold">Tendik Tereliminasi </h5>
+    <table class="table table-bordered align-middle text-center table-sm">
+        <thead class="table-light">
+            <tr>
+                <th>No</th>
+                <th>NIK Tendik</th>
+                <th>Nama Tendik</th>
+                <th>Nilai SAW</th>
+                <th>Ranking</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($eliminasi as $index => $row)
+                <tr class="bg-warning">
+                    <td class="bg-warning">{{ $index + 1 }}</td>
+                    <td class="bg-warning">{{ $row['tendik_nik'] }}</td>
+                    <td class="bg-warning">{{ $row['nama'] }}</td>
+                    <td class="bg-warning">{{ number_format($row['nilai_akhir'], 4) }}</td>
+                    <td class="bg-warning">{{ $row['rank'] }}</td>
+                </tr>
+            @endforeach
+            @if (count($eliminasi) === 0)
+                <tr><td colspan="5" class="text-center">Tidak ada data.</td></tr>
+            @endif
+        </tbody>
+    </table>
+
     <script>
         window.print();
     </script>

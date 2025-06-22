@@ -1,5 +1,5 @@
 @extends('layouts.app')
-<title>Edit Penilaian | Sistem Pengambilan Keputusan</title>
+<title>Edit Penilaian | Sistem Pendukung Keputusan</title>
 
 @section('content')
 <div id="app-content">
@@ -9,15 +9,15 @@
 
             <!-- Notifikasi Inputan Salah -->
             @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <strong>Terjadi kesalahan:</strong>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong>Terjadi kesalahan:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+            </div>
             @endif
 
             <!-- Auto close alert setelah 5 detik -->
@@ -36,10 +36,10 @@
                 <div class="col-lg-12 col-md-12 col-12">
                     <div class="d-flex justify-content-between align-items-center mb-5">
                         <div class="mb-2 mb-lg-0">
-                            <h3 class="mb-0 text-white">Edit Penilaian</h3>
+                            <h3 class="mb-0" style="color:white">Edit Penilaian</h3>
                         </div>
                         <div>
-                            <a href="/nilai" class="btn btn-secondary">Kembali</a>
+                            <a href="/nilai" class="btn btn-light btn-secondary">Kembali</a>
                         </div>
                     </div>
                 </div>
@@ -50,48 +50,43 @@
                 <div class="col-xl-12">
                     <div class="card mb-10">
                         <div class="tab-content p-4">
-                            <form class="row g-3 needs-validation" method="POST" action="/nilai/{{ $data->id }}" novalidate>
+                            <form method="POST" action="/nilai/tendik/{{ $tendik->nik }}">
                                 @csrf
                                 @method('PUT')
 
-                                <!-- Tendik -->
-                                <div class="col-md-6">
-                                    <label for="tendik_id" class="form-label">Nama Tendik</label>
-                                    <select name="tendik_id" id="tendik_id" class="form-select" required>
-                                        <option disabled value="">-- Pilih Tendik --</option>
-                                        @foreach($tendiks as $tendik)
-                                            <option value="{{ $tendik->id }}" {{ $data->tendik_id == $tendik->id ? 'selected' : '' }}>
-                                                {{ $tendik->nama }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="invalid-feedback">Pilih tendik.</div>
+                                <div class="row align-items-end">
+                                    <!-- NIK Tendik (readonly) -->
+                                    <div class="col-md-3">
+                                        <label class="form-label text-capitalize">Nama Tendik</label>
+                                        <input type="text" class="form-control" value="{{ $tendik->nama }}" disabled>
+                                        <input type="hidden" name="tendik_nik" value="{{ $tendik->nik }}">
+                                    </div>
+
+                                    <!-- Input nilai untuk setiap kriteria -->
+                                    @foreach($kriterias as $kriteria)
+                                    <div class="col-md-2">
+                                        <label class="form-label text-capitalize">{{ $kriteria->nama }}</label>
+                                        <input type="number"
+                                            name="nilai[{{ $kriteria->kode_kriteria }}]"
+                                            class="form-control"
+                                            placeholder="0 - 100"
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            value="{{ old('nilai.' . $kriteria->kode_kriteria, $nilaiMap[$kriteria->kode_kriteria] ?? '') }}"
+                                            required>
+                                        @error("nilai.{$kriteria->kode_kriteria}")
+                                        <div class="text-danger small">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    @endforeach
                                 </div>
 
-                                <!-- Kriteria -->
-                                <div class="col-md-6">
-                                    <label for="kriteria_id" class="form-label">Nama Kriteria</label>
-                                    <select name="kriteria_id" id="kriteria_id" class="form-select" required>
-                                        <option disabled value="">-- Pilih Kriteria --</option>
-                                        @foreach($kriterias as $kriteria)
-                                            <option value="{{ $kriteria->id }}" {{ $data->kriteria_id == $kriteria->id ? 'selected' : '' }}>
-                                                {{ $kriteria->nama }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="invalid-feedback">Pilih kriteria.</div>
-                                </div>
-
-                                <!-- Nilai -->
-                                <div class="col-md-6">
-                                    <label for="value" class="form-label">Nilai</label>
-                                    <input type="number" class="form-control" id="value" name="value" min="0" step="0.01" value="{{ $data->value }}" placeholder="Contoh: 0 - 100"  required>
-                                    <div class="invalid-feedback">Masukkan nilai.</div>
-                                </div>
-
-                                <!-- Tombol Simpan -->
-                                <div class="col-12">
-                                    <button class="btn btn-primary" type="submit">Simpan Perubahan</button>
+                                <!-- Tombol simpan di bawah -->
+                                <div class="row mt-4">
+                                    <div class="col-md-12 d-flex justify-content-start gap-2">
+                                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -100,5 +95,5 @@
             </div>
         </div>
     </div>
-</div>    
+</div>
 @endsection

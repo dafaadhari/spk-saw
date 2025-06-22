@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-<title>Kelola Bobot Kriteria | Sistem Pemgambilan Keputusan</title>
+<title>Kelola Bobot Kriteria | Sistem Pendukung Keputusan</title>
 @section('content')
 
 <style>
@@ -18,18 +18,21 @@
         <div class="bg-primary pt-12 pb-21 "></div>
         <div class="container-fluid mt-n22 ">
             <div class="row">
-                <div class="col-lg-12 col-md-12 col-12">
+                <div class="col-12">
+                    {{-- Alert responsif --}}
                     @if (session('success'))
-                    <div class="alert alert-success">
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
                         {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
                     </div>
                     @endif
-                    <div class="d-flex justify-content-between align-items-center mb-5">
-                        <div class="mb-2 mb-lg-0">
-                            <h3 class="mb-0  text-white">Kelola Bobot Kriteria</h3>
-                        </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start align-items-md-center gap-2 mb-4">
+                        <h3 class="mb-0" style="color:white">Kelola Bobot Kriteria</h3>
                         <div class="d-flex flex-wrap gap-2">
-                            <a href="{{route('kriteria.tambah')}}" class="btn btn-white">+ Tambah Data</a>
+                            <a href="{{ route('kriteria.tambah') }}" class="btn btn-white">+ Tambah Data</a>
                             <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalImport">
                                 <i class="bi bi-file-earmark-arrow-up me-1"></i> Import Excel
                             </button>
@@ -40,6 +43,8 @@
                     </div>
                 </div>
             </div>
+
+
 
             <!-- Filter & Table -->
             <div class="row mb-3 align-items-center">
@@ -82,8 +87,8 @@
                                     <td>{{ $kriteria->weight }}</td>
                                     <td>{{ $kriteria->sumber }}</td>
                                     <td>
-                                        <a href="{{ route('kriteria.edit' , $kriteria->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalHapus" data-id="{{ $kriteria->id }}" data-nama="{{ $kriteria->nama }}">
+                                        <a style="width: 60px;" href="{{ route('kriteria.edit', $kriteria->kode_kriteria) }}" class="btn btn-sm btn-primary mt-1">Edit</a>
+                                        <button style="width: 60px;" type="button" class=" mt-1 btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalHapus" data-id="{{ $kriteria->kode_kriteria }}" data-nama="{{ $kriteria->nama }}">
                                             Hapus
                                         </button>
                                     </td>
@@ -156,7 +161,7 @@
     const modalHapus = document.getElementById('modalHapus');
     modalHapus.addEventListener('show.bs.modal', function(event) {
         const button = event.relatedTarget;
-        const id = button.getAttribute('data-id');
+        const id = button.getAttribute('data-id'); // ini sekarang kode_kriteria
         const nama = button.getAttribute('data-nama');
 
         document.getElementById('kriteriaNama').textContent = nama;

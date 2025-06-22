@@ -12,7 +12,7 @@
              </a>
 
              <div class="d-none d-md-none d-lg-block p-2">
-                 Sistem Pengambilan Keputusan
+                 Sistem Pendukung Keputusan
              </div>
              <!--Navbar nav -->
              <ul class="navbar-nav navbar-right-wrap ms-lg-auto d-flex nav-top-wrap align-items-center ms-4 ms-lg-0">
@@ -64,7 +64,7 @@
                              <li>
                                  <a class="dropdown-item d-flex align-items-center" href="{{ route('profile.show') }}">
                                      <i class="me-2 icon-xxs dropdown-item-icon" data-feather="user"></i>
-                                     My Profile
+                                     Profil saya
                                  </a>
                              </li>
                              <li>
@@ -74,7 +74,7 @@
                                          class="dropdown-item"
                                          @click.prevent="$root.submit();">
                                          <i class="me-2 icon-xxs dropdown-item-icon" data-feather="power"></i>
-                                         {{ __('Sign Out') }}
+                                         {{ __('Keluar') }}
                                      </a>
                                  </form>
                              </li>

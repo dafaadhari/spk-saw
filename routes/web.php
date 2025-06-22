@@ -6,10 +6,16 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerhitunganController;
 use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\NilaiController;
+use App\Http\Controllers\ResetPasswordController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
+
+Route::post('/send-otp', [ResetPasswordController::class, 'sendOtp'])->name('password.email');
+Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOtp'])->name('password.verify.otp');
+Route::get('/reset-password-form', [ResetPasswordController::class, 'showResetForm'])->name('password.reset.form');
+Route::post('/reset-password-form', [ResetPasswordController::class, 'updatePassword'])->name('password.reset.update');
 
 Route::middleware([
     'auth:sanctum',
@@ -39,13 +45,17 @@ Route::middleware([
 
     Route::get('/nilai', [NilaiController::class, 'index']);
     Route::get('/nilai/create', [NilaiController::class, 'create']);
-    Route::post('/nilai', [NilaiController::class, 'store']);
-    Route::get('/nilai/{id}/edit', [NilaiController::class, 'edit']);
-    Route::put('/nilai/{id}', [NilaiController::class, 'update']);
-    Route::delete('/nilai/{id}', [NilaiController::class, 'destroy']);
+    Route::post('/nilai', [NilaiController::class, 'store'])->name('nilai');
+    Route::get('/nilai/tendik/{nik}/edit', [NilaiController::class, 'edit']);
+    Route::put('/nilai/tendik/{nik}', [NilaiController::class, 'update']);
+    Route::delete('/nilai/tendik/{nik}', [NilaiController::class, 'destroy']);
+    Route::post('/nilai/import', [NilaiController::class, 'import']);
+    Route::get('/nilai/export', [NilaiController::class, 'export']);
 
     Route::get('/lihatPerhitungan', [PerhitunganController::class, 'index']);
+    Route::get('/lihatPerhitungan/eliminasi', [PerhitunganController::class, 'eliminasi']);
     Route::get('/lihatPerhitungan/cetakPDF', [PerhitunganController::class, 'cetakPDF']);
+    Route::get('/lihatPerhitungan/cetakEliminasiPDF', [PerhitunganController::class, 'eliminasiPDF']);
 
     Route::get('/import', [KriteriaController::class, 'index'])->name('import.indexExcel');
     Route::post('/import', [KriteriaController::class, 'import'])->name('import.excel');

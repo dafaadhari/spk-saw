@@ -12,13 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tendiks', function (Blueprint $table) {
-            $table->id();
+            $table->char('nik', 16);
             $table->unsignedBigInteger('user_id');
             $table->string('nama');
-            $table->string('nik')->unique();
             $table->string('unit_kerja');
+            $table->string('jenis_pegawai');
+            $table->integer('jam_kerja_tahunan');
+            $table->decimal('jam_kerja_bulanan', 5, 2);
             $table->timestamps();
 
+            $table->primary('nik'); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-<title>Kelola Penilaian | Sistem Pengambilan Keputusan</title>
+<title>Kelola Penilaian | Sistem Pendukung Keputusan</title>
 
 @section('content')
 <div id="app-content">
@@ -27,12 +27,18 @@
 
                <div class="row">
                     <div class="col-lg-12 col-md-12 col-12">
-                         <div class="d-flex justify-content-between align-items-center mb-5">
+                         <div class="d-flex flex-wrap justify-content-between align-items-md-center align-items-start gap-2 mb-5">
                               <div class="mb-2 mb-lg-0">
-                                   <h3 class="mb-0 text-white">Kelola Penilaian</h3>
+                                   <h3 class="mb-0 " style="color:white">Kelola Penilaian</h3>
                               </div>
-                              <div>
+                              <div class="d-flex flex-wrap gap-2">
                                    <a href="{{ url('/nilai/create') }}" class="btn btn-white">+ Tambah Data</a>
+                                   <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalImport">
+                                        <i class="bi bi-file-earmark-arrow-down me-1"></i> Import Excel
+                                   </button>
+                                   <a href="{{ url('/nilai/export') }}" class="btn btn-success">
+                                        <i class="bi bi-file-earmark-arrow-up me-1"></i> Export Excel
+                                   </a>
                               </div>
                          </div>
                     </div>
@@ -64,36 +70,51 @@
                                    <thead class="table-light">
                                         <tr>
                                              <th>No</th>
-                                             <th>Nama Tendik</th>
-                                             <th>Nama Kriteria</th>
-                                             <th>Nilai</th>
+                                             <th>NIK</th>
+                                             <th>Nama</th>
+                                             @foreach($kriterias as $kriteria)
+                                             <th class="text-uppercase bg-secondary text-white text-center">{{ $kriteria->nama }}</th>
+                                             @endforeach
                                              <th>Aksi</th>
                                         </tr>
                                    </thead>
                                    <tbody>
-                                        @foreach($data as $index => $nilai)
+                                        @forelse($tendiks as $index => $tendik)
                                         <tr>
                                              <td>{{ $index + 1 }}</td>
-                                             <td>{{ $nilai->tendik->nama ?? '-' }}</td>
-                                             <td>{{ $nilai->kriteria->nama ?? '-' }}</td>
-                                             <td>{{ $nilai->value }}</td>
-                                             <td>
-                                                  <a href="{{ url('/nilai/' . $nilai->id . '/edit') }}" class="btn btn-sm btn-primary">Edit</a>
-                                                  <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $nilai->id }}">
+                                             <td>{{ $tendik->nik }}</td>
+                                             <td>{{ $tendik->nama }}</td>
+
+                                             @foreach($kriterias as $kriteria)
+                                             @php
+                                             $kode = strtoupper($kriteria->kode_kriteria);
+                                             $nilai = $tendik->nilais->firstWhere(fn($n) => strtoupper($n->kode_kriteria) === $kode);
+                                             @endphp
+                                             <td class="text-center">{{ $nilai->value ?? '-' }}</td>
+                                             @endforeach
+
+                                             <td class="d-flex gap-2">
+                                                  <!-- Tombol Edit -->
+                                                  <a href="{{ url('/nilai/tendik/' . $tendik->nik . '/edit') }}" class="btn btn-sm btn-primary" style="width:60px;">Edit</a>
+
+                                                  <!-- Tombol Hapus (trigger modal) -->
+                                                  <button type="button" class="btn btn-danger btn-sm" style="width:60px;" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $tendik->nik }}">
                                                        Hapus
                                                   </button>
-                                                  <div class="modal fade" id="deleteModal{{ $nilai->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $nilai->id }}" aria-hidden="true">
+
+                                                  <!-- Modal Konfirmasi Hapus -->
+                                                  <div class="modal fade" id="deleteModal{{ $tendik->nik }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $tendik->nik }}" aria-hidden="true">
                                                        <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
                                                                  <div class="modal-header">
-                                                                      <h5 class="modal-title" id="deleteModalLabel{{ $nilai->id }}">Konfirmasi Hapus</h5>
+                                                                      <h5 class="modal-title" id="deleteModalLabel{{ $tendik->nik }}">Konfirmasi Hapus</h5>
                                                                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                                                                  </div>
                                                                  <div class="modal-body">
-                                                                      Apakah kamu yakin ingin menghapus nilai ini?
+                                                                      Yakin ingin menghapus <strong>semua nilai</strong> untuk <strong>{{ $tendik->nama }}</strong>?
                                                                  </div>
                                                                  <div class="modal-footer">
-                                                                      <form action="{{ url('/nilai/' . $nilai->id) }}" method="POST">
+                                                                      <form action="{{ url('/nilai/tendik/' . $tendik->nik) }}" method="POST">
                                                                            @csrf
                                                                            @method('DELETE')
                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
@@ -105,15 +126,14 @@
                                                   </div>
                                              </td>
                                         </tr>
-                                        @endforeach
-
-                                        @if($data->isEmpty())
+                                        @empty
                                         <tr>
-                                             <td colspan="5" class="text-center">Belum ada data nilai.</td>
+                                             <td colspan="{{ 4 + $kriterias->count() }}" class="text-center">Belum ada data penilaian.</td>
                                         </tr>
-                                        @endif
+                                        @endforelse
                                    </tbody>
                               </table>
+
                               <ul class="pagination justify-content-end mt-3" id="pagination"></ul>
                          </div>
                     </div>
@@ -121,6 +141,35 @@
           </div>
      </div>
 </div>
+
+<!-- Modal Import -->
+<div class="modal fade" id="modalImport" tabindex="-1" aria-labelledby="modalImportLabel" aria-hidden="true">
+     <div class="modal-dialog modal-dialog-centered">
+          <form action="{{ url('/nilai/import') }}" method="POST" enctype="multipart/form-data">
+               @csrf
+               <div class="modal-content">
+                    <div class="modal-header">
+                         <h5 class="modal-title" id="modalImportLabel">Import Data Penilaian</h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                         <div class="mb-3">
+                              <label for="excel_file_nilai" class="form-label">Pilih File Excel</label>
+                              <input type="file" name="excel_file" id="excel_file_nilai" class="form-control" accept=".xlsx,.xls,.csv" required>
+                              <small class="text-muted">File harus berformat .xlsx, .xls, atau .csv <br> dengan kolom: NIK, Nama, KODE KRITERIA</small>
+                         </div>
+                    </div>
+                    <div class="modal-footer">
+                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                         <button type="submit" class="btn btn-success">Import Sekarang</button>
+                    </div>
+               </div>
+          </form>
+     </div>
+</div>
+
+
+
 @endsection
 
 <script>

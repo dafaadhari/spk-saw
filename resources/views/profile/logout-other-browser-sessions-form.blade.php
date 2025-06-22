@@ -1,15 +1,15 @@
 <div>
     <!-- Judul & Deskripsi -->
     <div class="mb-4">
-        <h5>{{ __('Browser Sessions') }}</h5>
+        <h5>{{ __('Sesi Browser') }}</h5>
         <p class="text-muted">
-            {{ __('Manage and log out your active sessions on other browsers and devices.') }}
+            {{ __('Kelola dan keluar dari sesi aktif Anda di browser dan perangkat lain.') }}
         </p>
     </div>
 
     <!-- Penjelasan -->
     <p class="text-muted small">
-        {{ __('If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.') }}
+        {{ __('Jika perlu, Anda dapat keluar dari semua sesi peramban lain di semua perangkat Anda. Beberapa sesi terkini Anda tercantum di bawah ini; namun, daftar ini mungkin tidak lengkap. Jika Anda merasa akun Anda telah disusupi, Anda juga harus memperbarui kata sandi Anda.') }}
     </p>
 
     <!-- List Session -->
@@ -34,7 +34,7 @@
                     @if ($session->is_current_device)
                     <span class="text-success fw-semibold">{{ __('This device') }}</span>
                     @else
-                    {{ __('Last active') }} {{ $session->last_active }}
+                    {{ __('Terakhir aktif') }} {{ $session->last_active }}
                     @endif
                 </div>
             </div>
@@ -50,7 +50,7 @@
             data-bs-target="#logoutSessionsModal"
             wire:click="confirmLogout"
             wire:loading.attr="disabled">
-            {{ __('Log Out Other Browser Sessions') }}
+            {{ __('Keluar dari Sesi Browser Lainnya') }}
         </button>
 
         <!-- Notifikasi "Done" -->
@@ -64,11 +64,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="logoutSessionsModalLabel">{{ __('Log Out Other Browser Sessions') }}</h5>
+                    <h5 class="modal-title" id="logoutSessionsModalLabel">{{ __('Keluar dari Sesi Browser Lainnya') }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
                 </div>
                 <div class="modal-body">
-                    <p>{{ __('Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.') }}</p>
+                    <p>{{ __('Harap masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin keluar dari sesi browser lain di semua perangkat Anda.') }}</p>
 
                     <input type="password"
                         class="form-control mt-3"
@@ -86,12 +86,12 @@
                     <button type="button" class="btn btn-secondary"
                         data-bs-dismiss="modal"
                         wire:click="$set('confirmingLogout', false)">
-                        {{ __('Cancel') }}
+                        {{ __('Batal') }}
                     </button>
                     <button type="button" class="btn btn-danger"
                         wire:click="logoutOtherBrowserSessions"
                         wire:loading.attr="disabled">
-                        <i class="bi bi-box-arrow-right me-1"></i>{{ __('Log Out') }}
+                        <i class="bi bi-box-arrow-right me-1"></i>{{ __('Keluar') }}
                     </button>
                 </div>
             </div>

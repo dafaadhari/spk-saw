@@ -1,27 +1,28 @@
 @extends('layouts.app')
 
-<title>Kelola Data Tendik | Sistem Pengambilan Keputusan</title>
+<title>Kelola Data Tendik | Sistem Pendukung Keputusan</title>
 
 @section('content')
 <div id="app-content">
     <div class="app-content-area pt-0">
-        <div class="bg-primary pt-12 pb-21"></div>
+        <div class="bg-primary pt-12 pb-22">
+        </div>
         <div class="container-fluid mt-n22">
-
-            @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
-            </div>
-            @endif
-
             <div class="row">
-                <div class="col-lg-12 col-md-12 col-12">
-                    <div class="d-flex justify-content-between align-items-center mb-5">
-                        <div class="mb-2 mb-lg-0">
-                            <h3 class="mb-0 text-white">Kelola Data Tendik</h3>
-                        </div>
-                        <div>
+                <div class="col-12">
+                    {{-- Alert responsif --}}
+                    @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Tutup"></button>
+                    </div>
+                    @endif
+                </div>
+
+                <div class="col-12">
+                    <div class="d-flex flex-wrap justify-content-between align-items-start align-items-md-center gap-2 mb-4">
+                        <h3 class="mb-0" style="color:white">Kelola Data Tendik</h3>
+                        <div class="d-flex flex-wrap gap-2">
                             <a href="{{ url('tendik/create') }}" class="btn btn-white">+ Tambah Data</a>
                             <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalImport">
                                 <i class="bi bi-file-earmark-arrow-up me-1"></i> Import Excel
@@ -34,8 +35,9 @@
                 </div>
             </div>
 
+            {{-- Filter --}}
             <div class="row mb-3 align-items-center">
-                <div class="col-md-8 mb-2 mb-md-0">
+                <div class=" col-md-8 mb-2 mb-md-0">
                     <label class="d-flex align-items-center gap-2 flex-wrap text-white">
                         Show
                         <select id="entriesSelect" class="form-select d-inline w-auto">
@@ -53,16 +55,20 @@
                 </div>
             </div>
 
+            {{-- Tabel --}}
             <div class="row">
-                <div class="col-xl-12">
+                <div class="col-12">
                     <div class="table-responsive">
-                        <table class="table" id="tendikTable">
+                        <table class="table table-sm" id="tendikTable">
                             <thead>
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
                                     <th>NIK</th>
                                     <th>Unit Kerja</th>
+                                    <th>Jenis Pegawai</th>
+                                    <th>Jam Kerja/Tahun</th>
+                                    <th>Jam Kerja/Bulan</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -73,12 +79,15 @@
                                     <td>{{ $row->nama }}</td>
                                     <td>{{ $row->nik }}</td>
                                     <td>{{ $row->unit_kerja }}</td>
+                                    <td>{{ $row->jenis_pegawai }}</td>
+                                    <td>{{ $row->jam_kerja_tahunan }}</td>
+                                    <td>{{ number_format($row->jam_kerja_bulanan, 2, ',', '.') }}</td>
                                     <td>
-                                        <a href="{{ url('tendik/' . $row->id . '/edit') }}" class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="#" class="btn btn-danger btn-sm"
+                                        <a href="{{ url('tendik/' . $row->nik . '/edit') }}" class="btn btn-sm btn-primary mb-1" style="width:60px;">Edit</a>
+                                        <a style="width:60px;" href="#" class="btn btn-danger btn-sm mb-1"
                                             data-bs-toggle="modal"
                                             data-bs-target="#confirmDeleteModal"
-                                            data-id="{{ $row->id }}"
+                                            data-id="{{ $row->nik }}"
                                             data-nama="{{ $row->nama }}">
                                             Hapus
                                         </a>
@@ -86,7 +95,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5" class="text-center">Tidak ada data</td>
+                                    <td colspan="8" class="text-center">Tidak ada data</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -95,12 +104,12 @@
                     </div>
                 </div>
             </div>
-
         </div>
+
     </div>
 </div>
 
-<!-- Modal Import Excel Tendik -->
+{{-- Modal Import --}}
 <div class="modal fade" id="modalImport" tabindex="-1" aria-labelledby="modalImportLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('tendik.import') }}" method="POST" enctype="multipart/form-data">
@@ -114,7 +123,7 @@
                     <div class="mb-3">
                         <label for="excel_file_tendik" class="form-label">Pilih File Excel</label>
                         <input type="file" name="excel_file" id="excel_file_tendik" class="form-control" accept=".xlsx,.xls,.csv" required>
-                        <small class="text-muted">File harus berformat .xlsx, .xls, atau .csv dengan kolom: Nama, NIP, Unit Kerja</small>
+                        <small class="text-muted">File harus berformat .xlsx, .xls, atau .csv dengan kolom: NIK, Nama, Unit Kerja, Jenis Pegawai, Jam Kerja Tahunan, Jam Kerja Bulanan</small>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -126,8 +135,8 @@
     </div>
 </div>
 
-<!-- Modal Konfirmasi Hapus -->
-<div class="modal fade" id="confirmDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+{{-- Modal Konfirmasi Hapus --}}
+<div class="modal fade" id="confirmDeleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <form method="POST" id="deleteForm">
@@ -150,6 +159,7 @@
 </div>
 @endsection
 
+{{-- Script Filter & Pagination --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = document.getElementById('confirmDeleteModal');

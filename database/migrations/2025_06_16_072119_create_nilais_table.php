@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('nilais', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tendik_id');
-            $table->unsignedBigInteger('kriteria_id');
+
+            $table->char('tendik_nik', 16);
+            $table->char('kode_kriteria', 35);
+
             $table->float('value');
             $table->timestamps();
 
-            $table->foreign('tendik_id')->references('id')->on('tendiks')->onDelete('cascade');
-            $table->foreign('kriteria_id')->references('id')->on('kriterias')->onDelete('cascade');
+            $table->foreign('tendik_nik')->references('nik')->on('tendiks')->onDelete('cascade');
+            $table->foreign('kode_kriteria')->references('kode_kriteria')->on('kriterias')->onDelete('cascade');
         });
     }
 
