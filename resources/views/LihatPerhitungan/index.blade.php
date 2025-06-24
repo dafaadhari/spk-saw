@@ -47,14 +47,17 @@
                             <th>NIK</th>
                             <th>Nama</th>
                             <th>Nilai SAW</th>
-                            <th>Ranking</th>    
+                            <th>Ranking</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody x-data="{ showAll: false }">
                         @forelse ($lolos as $index => $row)
-                        @php $warna = $row['rank'] <= 4 ? 'bg-success text-white' : 'bg-primary text-white' ; @endphp
-                            <tr>
-                            <td>{{ $lolos->firstItem() + $index }}</td>
+                        @php
+                        $warna = $row['rank'] <= 4 ? 'bg-success text-white' : 'bg-primary text-white' ;
+                            @endphp
+
+                            <tr x-show="showAll || {{ $index < 10 ? 'true' : 'false' }}">
+                            <td>{{ $loop->iteration }}</td>
                             <td class="{{ $warna }}">{{ $row['tendik_nik'] }}</td>
                             <td class="{{ $warna }}">{{ $row['nama'] }}</td>
                             <td class="{{ $warna }}">{{ number_format($row['nilai_akhir'], 4) }}</td>
@@ -65,6 +68,16 @@
                                 <td colspan="5" class="text-center">Tidak ada data lolos.</td>
                             </tr>
                             @endforelse
+
+                            @if ($lolos->count() > 10)
+                            <tr x-show="!showAll">
+                                <td colspan="5" class="text-center">
+                                    <button @click="showAll = true" class="btn btn-sm btn-outline-primary mt-2">
+                                        Tampilkan Semua
+                                    </button>
+                                </td>
+                            </tr>
+                            @endif
                     </tbody>
                 </table>
                 {{-- {{ $lolos->appends(request()->query())->links() }} --}}

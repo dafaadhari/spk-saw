@@ -37,7 +37,7 @@ class TendikController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|unique:tendiks,nik',
+            'nik' => 'required|string|unique:tendiks,nik',
             'unit_kerja' => 'required|string|max:255',
             'jenis_pegawai' => 'required|string|max:255',
             'jam_kerja_tahunan' => 'required|integer|min:0',
@@ -46,7 +46,7 @@ class TendikController extends Controller
         ], [
             'nama.required' => 'Nama wajib diisi.',
             'nik.required' => 'NIK wajib diisi.',
-            'nik.size' => 'NIK harus tepat 16 karakter.',
+            'nik.size' => 'NIK harus di isi.',
             'nik.unique' => 'NIK sudah digunakan.',
             'unit_kerja.required' => 'Unit kerja wajib diisi.',
             'jenis_pegawai.required' => 'Jenis pegawai wajib diisi.',
@@ -80,7 +80,7 @@ class TendikController extends Controller
 
         $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|size:16|unique:tendiks,nik,' . $tendik->nik . ',nik',
+            'nik' => 'required|string|unique:tendiks,nik,' . $tendik->nik . ',nik',
             'unit_kerja' => 'required|string|max:255',
             'jenis_pegawai' => 'required|string|max:255',
             'jam_kerja_tahunan' => 'required|integer|min:0',
@@ -89,7 +89,7 @@ class TendikController extends Controller
         ], [
             'nama.required' => 'Nama wajib diisi.',
             'nik.required' => 'NIK wajib diisi.',
-            'nik.size' => 'NIK harus tepat 16 karakter.',
+            'nik.size' => 'NIK harus di isi.',
             'nik.unique' => 'NIK sudah digunakan.',
             'unit_kerja.required' => 'Unit kerja wajib diisi.',
             'jenis_pegawai.required' => 'Jenis pegawai wajib diisi.',

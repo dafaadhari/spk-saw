@@ -76,10 +76,16 @@ class PerhitunganController extends Controller
         $lolos = array_filter($filtered, fn($r) => $r['jam_kerja_bulanan'] >= 160);
         $eliminasi = array_filter($filtered, fn($r) => $r['jam_kerja_bulanan'] < 160);
 
+        // Urutkan berdasarkan rank agar tampilan sesuai
+        usort($lolos, fn($a, $b) => $a['rank'] <=> $b['rank']);
+        usort($eliminasi, fn($a, $b) => $b['rank'] <=> $a['rank']);
+
         // Paginate manual
-        $lolosPaginator = $this->paginateArray(array_values($lolos), $perPage, $request, 'lolos_page');
+        // $lolosPaginator = $this->paginateArray(array_values($lolos), $perPage, $request, 'lolos_page');
+        $lolosPaginator = collect(array_values($lolos)); 
         $eliminasiPaginator = $this->paginateArray(array_values($eliminasi), $perPage, $request, 'eliminasi_page');
 
+        // dd($lolosPaginator, $eliminasi);
         return view('LihatPerhitungan.index', [
             'lolos' => $lolosPaginator,
             'eliminasi' => $eliminasiPaginator,

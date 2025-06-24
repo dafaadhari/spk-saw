@@ -21,21 +21,13 @@ class NilaiController extends Controller
     public function index()
     {
         $kriterias = Kriteria::all();
-        $jumlahKriteria = $kriterias->count();
-        $kodeKriteriaResmi = $kriterias->pluck('kode_kriteria')->map(fn($x) => strtoupper($x))->toArray();
 
         // Ambil semua tendik dengan relasi nilai
         $tendiks = Tendik::with(['nilais'])->get();
 
-        $filteredTendiks = $tendiks->filter(function ($tendik) use ($kodeKriteriaResmi) {
-            $kodeNilai = $tendik->nilais->pluck('kode_kriteria')->map(fn($x) => strtoupper($x))->unique()->toArray();
-            // Cek apakah semua kode kriteria resmi ada di nilai
-            return count(array_intersect($kodeKriteriaResmi, $kodeNilai)) === count($kodeKriteriaResmi);
-        });
-
         return view('KelolaPenilaian.index', [
             'kriterias' => $kriterias,
-            'tendiks' => $filteredTendiks
+            'tendiks' => $tendiks
         ]);
     }
 
@@ -144,6 +136,7 @@ class NilaiController extends Controller
         return redirect('/nilai')->with('success', 'Semua data penilaian untuk ' . $tendik->nama . ' berhasil dihapus.');
     }
 
+
     public function import(Request $request)
     {
         $request->validate([
@@ -162,14 +155,13 @@ class NilaiController extends Controller
             return back()->withErrors(['File kosong atau tidak memiliki data.']);
         }
 
-        $header = $sheet[0];
-        $kodeKriterias = array_map('trim', array_slice($header, 1));
+        $header = $sheet[0]; // Header baris 1
+        $kodeKriterias = array_map('trim', array_slice($header, 2)); // Kolom C dst (KRITERIA), abaikan NIK dan NAMA
 
         foreach ($sheet as $index => $row) {
             if ($index === 0) continue;
 
             $nik = trim($row[0]);
-
             if (!$nik) {
                 $errors[] = "Baris " . ($index + 1) . ": NIK kosong.";
                 continue;
@@ -183,9 +175,16 @@ class NilaiController extends Controller
 
             foreach ($kodeKriterias as $colIndex => $kode_kriteria) {
                 $kode_kriteria = strtoupper(trim($kode_kriteria));
-                $value = $row[$colIndex + 1] ?? null;
+                $value = $row[$colIndex + 2] ?? null; // +2 karena kolom C dst
 
-                if (!Kriteria::where('kode_kriteria', $kode_kriteria)->exists()) {
+                // Kolom tidak cukup
+                if (!isset($row[$colIndex + 2])) {
+                    $errors[] = "Baris " . ($index + 1) . ": Kolom untuk \"$kode_kriteria\" kosong.";
+                    continue;
+                }
+
+                // Validasi kriteria
+                if (!Kriteria::whereRaw('UPPER(kode_kriteria) = ?', [$kode_kriteria])->exists()) {
                     $errors[] = "Baris " . ($index + 1) . ": Kode kriteria \"$kode_kriteria\" tidak valid.";
                     continue;
                 }
@@ -213,7 +212,7 @@ class NilaiController extends Controller
             }
         }
 
-        // Logging
+        // LOG
         $logText = now()->toDateTimeString() . " - IMPORT NILAI\n";
         $logText .= "Total berhasil: $inserted\n";
         $logText .= "Total gagal: " . count($errors) . "\n\n";
@@ -229,7 +228,7 @@ class NilaiController extends Controller
                 ->with('success', "$inserted nilai berhasil diimpor. " . count($errors) . " gagal.");
         }
 
-        return redirect('/nilai')->with('success', "$inserted data penilaian berhasil diimpor.");
+        return redirect('/nilai')->with('success', "$inserted nilai berhasil diimpor.");
     }
 
     public function export()
@@ -242,32 +241,40 @@ class NilaiController extends Controller
 
         // Header kolom
         $sheet->setCellValue('A1', 'NIK');
+        $sheet->setCellValue('B1', 'NAMA');
 
         foreach ($kriterias as $index => $kriteria) {
-            $colLetter = Coordinate::stringFromColumnIndex($index + 2); // Kolom B++
-            $sheet->setCellValue("{$colLetter}1", strtoupper($kriteria->kode_kriteria)); // UPPERCASE
+            $colLetter = Coordinate::stringFromColumnIndex($index + 3); // Mulai dari kolom C (karena A=NIK, B=NAMA)
+            $sheet->setCellValue("{$colLetter}1", strtoupper($kriteria->kode_kriteria));
         }
 
         // Data baris per tendik
         $row = 2;
         foreach ($tendiks as $tendik) {
             $sheet->setCellValue("A{$row}", $tendik->nik);
+            $sheet->setCellValue("B{$row}", $tendik->nama); // tambahkan nama
+
+            // Buat map nilai: KODE_KRITERIA => value
+            $nilaiMap = $tendik->nilais
+                ->mapWithKeys(function ($item) {
+                    return [strtoupper($item->kode_kriteria) => $item->value];
+                });
 
             foreach ($kriterias as $index => $kriteria) {
-                $colLetter = Coordinate::stringFromColumnIndex($index + 2);
-                $nilai = $tendik->nilais->firstWhere('kode_kriteria', $kriteria->kode_kriteria);
-                $sheet->setCellValue("{$colLetter}{$row}", $nilai->value ?? '');
+                $colLetter = Coordinate::stringFromColumnIndex($index + 3); // Kolom C dst
+                $value = $nilaiMap->get(strtoupper($kriteria->kode_kriteria)) ?? '';
+                $sheet->setCellValue("{$colLetter}{$row}", $value);
             }
 
             $row++;
         }
 
-        // Styling header: abu-abu gelap + teks putih bold
-        $lastCol = Coordinate::stringFromColumnIndex(count($kriterias) + 1);
+        // Styling header
+        $lastCol = Coordinate::stringFromColumnIndex(count($kriterias) + 2); // +2 karena A dan B
         $headerRange = "A1:{$lastCol}1";
 
-        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A0A0A0'); // grey
-        $sheet->getStyle($headerRange)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF'); // white
+        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A0A0A0'); // abu
+        $sheet->getStyle($headerRange)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF'); // putih
 
         // Simpan dan download
         $writer = new Xlsx($spreadsheet);
