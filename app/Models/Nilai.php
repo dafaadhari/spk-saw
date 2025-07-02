@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Nilai extends Model
 {
-    protected $fillable = ['tendik_nik', 'kode_kriteria', 'value'];
+    protected $fillable = ['tendik_nik', 'kode_kriteria', 'value']; /* Kolom yang ada di table */
 
     public function tendik()
     {

@@ -18,7 +18,7 @@ class Tendik extends Model
         'jenis_pegawai',
         'jam_kerja_tahunan',
         'jam_kerja_bulanan'
-    ];
+    ]; /* Kolom yang ada di table */
 
     public function user()
     {

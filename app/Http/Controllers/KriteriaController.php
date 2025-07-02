@@ -29,7 +29,7 @@ class KriteriaController extends Controller
 
     public function tambah()
     {
-        return view('KelolaBobotKriteria.formtambah');
+        return view('KelolaBobotKriteria.formtambah'); /* Buka Directory View Folder Kelola Bobot Kriteria dalam file formtambah */
     }
 
     public function save(Request $request)

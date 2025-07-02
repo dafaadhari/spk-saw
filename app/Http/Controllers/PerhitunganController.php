@@ -129,13 +129,13 @@ class PerhitunganController extends Controller
             $nilai_akhir = 0;
 
             foreach ($kriterias as $kriteria) {
-                $nilai = Nilai::where('tendik_nik', $tendik->nik)
+                $nilai = Nilai::where('tendik_nik', $tendik->nik) /* Untuk Mencocokan Nilai antara Data Kriteria dengan Data Alternatif dan Tendik(NIK)*/
                     ->where('kode_kriteria', $kriteria->kode_kriteria)
-                    ->first();
+                    ->first(); /* Mengambil  data perbaris */
 
                 if ($nilai) {
-                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria];
-                    $nilai_akhir += $kriteria->weight * $normalized;
+                    $hasilnormalized = $nilai->value / $maxValues[$kriteria->kode_kriteria]; /* Normalisasi, Dibagi Nilai Maximum Perkriteria*/
+                    $nilai_akhir += $hasilnormalized * $kriteria->weight; /* Hitung Hasil Akhir, Hasil Normalisasi x Bobot + Hasil Semua Nilai Kriteria*/
                 }
             }
 
