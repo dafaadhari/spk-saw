@@ -50,16 +50,16 @@
                 <div class="col-xl-12">
                     <div class="card mb-10">
                         <div class="tab-content p-4">
-                            <form method="POST" action="/nilai/tendik/{{ $tendik->nik }}">
+                            <form method="POST" action="/nilai/Alternatif/{{ $Alternatif->nik }}">
                                 @csrf
                                 @method('PUT')
 
                                 <div class="row align-items-end">
-                                    <!-- NIK Tendik (readonly) -->
+                                    <!-- NIK Alternatif (readonly) -->
                                     <div class="col-md-3">
-                                        <label class="form-label text-capitalize">Nama Tendik</label>
-                                        <input type="text" class="form-control" value="{{ $tendik->nama }}" disabled>
-                                        <input type="hidden" name="tendik_nik" value="{{ $tendik->nik }}">
+                                        <label class="form-label text-capitalize">Nama Alternatif</label>
+                                        <input type="text" class="form-control" value="{{ $Alternatif->nama }}" disabled>
+                                        <input type="hidden" name="alternatif_nik" value="{{ $Alternatif->nik }}">
                                     </div>
 
                                     <!-- Input nilai untuk setiap kriteria -->

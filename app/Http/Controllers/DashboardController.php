@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kriteria;
-use App\Models\Tendik;
+use App\Models\Alternatif;
 use App\Models\Nilai;
 use App\Models\Hasil;
 
@@ -17,12 +17,12 @@ class DashboardController extends Controller
     {
         // Ambil semua data dari tabel 
         $kriteriaCount = Kriteria::count();
-        $tendikCount = Tendik::count();
+        $AlternatifCount = Alternatif::count();
         $penilaianCount = Nilai::count();
         $perhitunganCount = Hasil::count();
 
         // Group per rank
-        $rankCounts = Hasil::with('tendik')
+        $rankCounts = Hasil::with('Alternatif')
             ->orderBy('rank', 'asc')
             ->take(5)
             ->get();
@@ -31,7 +31,7 @@ class DashboardController extends Controller
         // Kirim data ke view 'dashboard'
         return view('dashboard', compact(
             'kriteriaCount',
-            'tendikCount',
+            'AlternatifCount',
             'penilaianCount',
             'perhitunganCount',
             'rankCounts'

@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('nilais', function (Blueprint $table) {
             $table->id();
 
-            $table->char('tendik_nik', 16);
+            $table->char('alternatif_nik', 16);
             $table->char('kode_kriteria', 35);
 
             $table->float('value');
             $table->timestamps();
 
-            $table->foreign('tendik_nik')->references('nik')->on('tendiks')->onDelete('cascade');
+            $table->foreign('alternatif_nik')->references('nik')->on('alternatifs')->onDelete('cascade');
             $table->foreign('kode_kriteria')->references('kode_kriteria')->on('kriterias')->onDelete('cascade');
         });
     }

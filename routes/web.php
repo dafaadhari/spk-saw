@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\TendikController;
+use App\Http\Controllers\AlternatifController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PerhitunganController;
@@ -32,23 +32,23 @@ Route::middleware([
     Route::delete('/kriteria/{id}', [KriteriaController::class, 'delete'])->name('kriteria.hapus');
 
 
-    Route::get('/tendik', [TendikController::class, 'index'])->name('tendik.index');
-    Route::delete('/tendik/{id}', [TendikController::class, 'delete'])->name('tendik.delete');
-    Route::get('/tendik/create', [TendikController::class, 'create']);
-    Route::post('/tendik', [TendikController::class, 'store']);
-    Route::get('/tendik/{id}/edit', [TendikController::class, 'edit'])->name('tendik.edit');
-    Route::put('/tendik/{id}', [TendikController::class, 'update'])->name('tendik.update');
-    Route::post('/tendik/import', [TendikController::class, 'import'])->name('tendik.import');
-    Route::get('/tendik/export', [TendikController::class, 'export'])->name('tendik.export');
+    Route::get('/Alternatif', [AlternatifController::class, 'index'])->name('Alternatif.index');
+    Route::delete('/Alternatif/{id}', [AlternatifController::class, 'delete'])->name('Alternatif.delete');
+    Route::get('/Alternatif/create', [AlternatifController::class, 'create']);
+    Route::post('/Alternatif', [AlternatifController::class, 'store']);
+    Route::get('/Alternatif/{id}/edit', [AlternatifController::class, 'edit'])->name('Alternatif.edit');
+    Route::put('/Alternatif/{id}', [AlternatifController::class, 'update'])->name('Alternatif.update');
+    Route::post('/Alternatif/import', [AlternatifController::class, 'import'])->name('Alternatif.import');
+    Route::get('/Alternatif/export', [AlternatifController::class, 'export'])->name('Alternatif.export');
 
 
 
     Route::get('/nilai', [NilaiController::class, 'index']);
     Route::get('/nilai/create', [NilaiController::class, 'create']);
     Route::post('/nilai', [NilaiController::class, 'store'])->name('nilai');
-    Route::get('/nilai/tendik/{nik}/edit', [NilaiController::class, 'edit']);
-    Route::put('/nilai/tendik/{nik}', [NilaiController::class, 'update']);
-    Route::delete('/nilai/tendik/{nik}', [NilaiController::class, 'destroy']);
+    Route::get('/nilai/Alternatif/{nik}/edit', [NilaiController::class, 'edit']);
+    Route::put('/nilai/Alternatif/{nik}', [NilaiController::class, 'update']);
+    Route::delete('/nilai/Alternatif/{nik}', [NilaiController::class, 'destroy']);
     Route::post('/nilai/import', [NilaiController::class, 'import']);
     Route::get('/nilai/export', [NilaiController::class, 'export']);
 
