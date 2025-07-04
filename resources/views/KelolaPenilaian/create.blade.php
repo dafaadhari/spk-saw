@@ -48,16 +48,16 @@
                                 @csrf
 
                                 <div class="row align-items-end">
-                                    <!-- Kolom Pilih Tendik -->
+                                    <!-- Kolom Pilih Alternatif -->
                                     <div class="col-md-3">
-                                        <label class="form-label text-capitalize">Nama Tendik</label>
-                                        <select name="tendik_nik" class="form-select" required>
-                                            <option disabled selected value="">-- Pilih Tendik --</option>
-                                            @foreach($tendiks as $tendik)
-                                            <option value="{{ $tendik->nik }}">{{ $tendik->nama }}</option>
+                                        <label class="form-label text-capitalize">Nama Alternatif</label>
+                                        <select name="alternatif_nik" class="form-select" required>
+                                            <option disabled selected value="">-- Pilih Alternatif --</option>
+                                            @foreach($alternatifs as $Alternatif)
+                                            <option value="{{ $Alternatif->nik }}">{{ $Alternatif->nama }}</option>
                                             @endforeach
                                         </select>
-                                        @error('tendik_nik')
+                                        @error('alternatif_nik')
                                         <div class="text-danger small">{{ $message }}</div>
                                         @enderror
                                     </div>
@@ -89,17 +89,17 @@
                                     const rows = document.querySelectorAll('.nilai-row');
 
                                     rows.forEach((currentRow, currentIndex) => {
-                                        const currentTendik = currentRow.querySelector('select[name="tendik_nik[]"]');
+                                        const currentAlternatif = currentRow.querySelector('select[name="alternatif_nik[]"]');
                                         const currentKriteria = currentRow.querySelector('select[name="kode_kriteria[]"]');
 
                                         const selectedPairs = [];
                                         rows.forEach((row, idx) => {
                                             if (idx !== currentIndex) {
-                                                const tendik = row.querySelector('select[name="tendik_nik[]"]').value;
+                                                const Alternatif = row.querySelector('select[name="alternatif_nik[]"]').value;
                                                 const kriteria = row.querySelector('select[name="kode_kriteria[]"]').value;
-                                                if (tendik && kriteria) {
+                                                if (Alternatif && kriteria) {
                                                     selectedPairs.push({
-                                                        tendik,
+                                                        Alternatif,
                                                         kriteria
                                                     });
                                                 }
@@ -113,7 +113,7 @@
                                         });
 
                                         selectedPairs.forEach(pair => {
-                                            if (pair.tendik === currentTendik.value) {
+                                            if (pair.Alternatif === currentAlternatif.value) {
                                                 options.forEach(option => {
                                                     if (option.value === pair.kriteria) {
                                                         option.disabled = true;
@@ -126,7 +126,7 @@
                                 }
 
                                 function bindEvents(row) {
-                                    row.querySelectorAll('select[name="tendik_nik[]"], select[name="kode_kriteria[]"]').forEach(select => {
+                                    row.querySelectorAll('select[name="alternatif_nik[]"], select[name="kode_kriteria[]"]').forEach(select => {
                                         select.addEventListener('change', updateKriteriaOptions);
                                     });
                                 }

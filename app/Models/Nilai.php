@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Nilai extends Model
 {
-    protected $fillable = ['tendik_nik', 'kode_kriteria', 'value']; /* Kolom yang ada di table */
+    protected $fillable = ['alternatif_nik', 'kode_kriteria', 'value'];
 
-    public function tendik()
+    public function Alternatif()
     {
-        return $this->belongsTo(Tendik::class, 'tendik_nik', 'nik');
+        return $this->belongsTo(Alternatif::class, 'alternatif_nik', 'nik');
     }
 
     public function kriteria()

@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('hasils', function (Blueprint $table) {
             $table->id();
-            $table->char('tendik_nik', 16);
+            $table->char('alternatif_nik', 16);
 
             $table->float('final_hasil');
             $table->integer('rank');
             $table->timestamps();
 
-            $table->foreign('tendik_nik')->references('nik')->on('tendiks')->onDelete('cascade');
+            $table->foreign('alternatif_nik')->references('nik')->on('alternatifs')->onDelete('cascade');
         });
     }
 

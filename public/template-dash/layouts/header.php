@@ -175,7 +175,7 @@
                                 <a href="KelolaBobot.php">Kelola Bobot Kriteria</a>
                             </li>
                             <li class="nav-link">
-                                <a href="/">Kelola Data Tendik</a>
+                                <a href="/">Kelola Data Alternatif</a>
                             </li>
                             <li class="nav-link">
                                 <a href="/">Kelola Penilaian</a>

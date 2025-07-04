@@ -10,7 +10,7 @@ class Kriteria extends Model
     public $incrementing = false;
     protected $keyType = 'string';
 
-    protected $fillable = ['kode_kriteria', 'nama', 'weight', 'sumber']; /* Kolom yang ada di table */
+    protected $fillable = ['kode_kriteria', 'nama', 'weight', 'sumber'];
 
     public function nilais()
     {

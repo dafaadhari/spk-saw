@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Nilai;
-use App\Models\Tendik;
+use App\Models\Alternatif;
 use App\Models\Kriteria;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\DB;
@@ -21,46 +21,54 @@ class NilaiController extends Controller
     public function index()
     {
         $kriterias = Kriteria::all();
+        $jumlahKriteria = $kriterias->count();
+        $kodeKriteriaResmi = $kriterias->pluck('kode_kriteria')->map(fn($x) => strtoupper($x))->toArray();
 
-        // Ambil semua tendik dengan relasi nilai
-        $tendiks = Tendik::with(['nilais'])->get();
+        // Ambil semua Alternatif dengan relasi nilai
+        $alternatifs = Alternatif::with(['nilais'])->get();
+
+        $filteredalternatifs = $alternatifs->filter(function ($Alternatif) use ($kodeKriteriaResmi) {
+            $kodeNilai = $Alternatif->nilais->pluck('kode_kriteria')->map(fn($x) => strtoupper($x))->unique()->toArray();
+            // Cek apakah semua kode kriteria resmi ada di nilai
+            return count(array_intersect($kodeKriteriaResmi, $kodeNilai)) === count($kodeKriteriaResmi);
+        });
 
         return view('KelolaPenilaian.index', [
             'kriterias' => $kriterias,
-            'tendiks' => $tendiks
+            'alternatifs' => $filteredalternatifs
         ]);
     }
 
     // Form Tambah Nilai
     public function create()
     {
-        $tendiks = Tendik::all();
+        $alternatifs = Alternatif::all();
         $kriterias = Kriteria::all();
-        return view('KelolaPenilaian.create', compact('tendiks', 'kriterias'));
+        return view('KelolaPenilaian.create', compact('alternatifs', 'kriterias'));
     }
 
     // Simpan Nilai Baru
     public function store(Request $request)
     {
         $request->validate([
-            'tendik_nik' => 'required|exists:tendiks,nik',
+            'alternatif_nik' => 'required|exists:alternatifs,nik',
             'nilai' => 'required|array',
             'nilai.*' => 'required|numeric|min:0|max:100',
         ], [
-            'tendik_nik.required' => 'Tendik wajib dipilih.',
-            'tendik_nik.exists' => 'Tendik tidak valid.',
+            'alternatif_nik.required' => 'Alternatif wajib dipilih.',
+            'alternatif_nik.exists' => 'Alternatif tidak valid.',
             'nilai.*.required' => 'Semua nilai wajib diisi.',
             'nilai.*.numeric' => 'Nilai harus berupa angka.',
             'nilai.*.min' => 'Nilai minimal 0.',
             'nilai.*.max' => 'Nilai maksimal 100.',
         ]);
 
-        $nik = $request->tendik_nik;
+        $nik = $request->alternatif_nik;
         $data = [];
         $errors = new \Illuminate\Support\MessageBag();
 
         foreach ($request->nilai as $kode_kriteria => $value) {
-            $exists = Nilai::where('tendik_nik', $nik)
+            $exists = Nilai::where('alternatif_nik', $nik)
                 ->where('kode_kriteria', $kode_kriteria)
                 ->exists();
 
@@ -71,7 +79,7 @@ class NilaiController extends Controller
             }
 
             $data[] = [
-                'tendik_nik' => $nik,
+                'alternatif_nik' => $nik,
                 'kode_kriteria' => $kode_kriteria,
                 'value' => $value,
             ];
@@ -89,15 +97,15 @@ class NilaiController extends Controller
     // Form Edit Nilai
     public function edit($nik)
     {
-        $tendik = Tendik::where('nik', $nik)->firstOrFail();
+        $Alternatif = Alternatif::where('nik', $nik)->firstOrFail();
         $kriterias = Kriteria::all();
 
-        // Ambil nilai yang sudah ada untuk tendik ini (per kriteria)
-        $nilaiMap = Nilai::where('tendik_nik', $nik)
+        // Ambil nilai yang sudah ada untuk Alternatif ini (per kriteria)
+        $nilaiMap = Nilai::where('alternatif_nik', $nik)
             ->pluck('value', 'kode_kriteria'); // hasil: [kode_kriteria => nilai]
 
         return view('KelolaPenilaian.edit', [
-            'tendik' => $tendik,
+            'Alternatif' => $Alternatif,
             'kriterias' => $kriterias,
             'nilaiMap' => $nilaiMap,
         ]);
@@ -107,7 +115,7 @@ class NilaiController extends Controller
     public function update(Request $request, $nik)
     {
         $request->validate([
-            'tendik_nik' => 'required|exists:tendiks,nik',
+            'alternatif_nik' => 'required|exists:alternatifs,nik',
             'nilai' => 'required|array',
             'nilai.*' => 'required|numeric|min:0|max:100',
         ]);
@@ -115,7 +123,7 @@ class NilaiController extends Controller
         foreach ($request->nilai as $kode_kriteria => $value) {
             Nilai::updateOrCreate(
                 [
-                    'tendik_nik' => $request->tendik_nik,
+                    'alternatif_nik' => $request->alternatif_nik,
                     'kode_kriteria' => $kode_kriteria
                 ],
                 ['value' => $value]
@@ -128,14 +136,13 @@ class NilaiController extends Controller
     // Hapus Nilai
     public function destroy($nik)
     {
-        $tendik = Tendik::where('nik', $nik)->firstOrFail();
+        $Alternatif = Alternatif::where('nik', $nik)->firstOrFail();
 
-        // Hapus semua nilai yang terkait dengan tendik ini
-        Nilai::where('tendik_nik', $nik)->delete();
+        // Hapus semua nilai yang terkait dengan Alternatif ini
+        Nilai::where('alternatif_nik', $nik)->delete();
 
-        return redirect('/nilai')->with('success', 'Semua data penilaian untuk ' . $tendik->nama . ' berhasil dihapus.');
+        return redirect('/nilai')->with('success', 'Semua data penilaian untuk ' . $Alternatif->nama . ' berhasil dihapus.');
     }
-
 
     public function import(Request $request)
     {
@@ -155,36 +162,30 @@ class NilaiController extends Controller
             return back()->withErrors(['File kosong atau tidak memiliki data.']);
         }
 
-        $header = $sheet[0]; // Header baris 1
-        $kodeKriterias = array_map('trim', array_slice($header, 2)); // Kolom C dst (KRITERIA), abaikan NIK dan NAMA
+        $header = $sheet[0];
+        $kodeKriterias = array_map('trim', array_slice($header, 1));
 
         foreach ($sheet as $index => $row) {
             if ($index === 0) continue;
 
             $nik = trim($row[0]);
+
             if (!$nik) {
                 $errors[] = "Baris " . ($index + 1) . ": NIK kosong.";
                 continue;
             }
 
-            $tendik = Tendik::where('nik', $nik)->first();
-            if (!$tendik) {
+            $Alternatif = Alternatif::where('nik', $nik)->first();
+            if (!$Alternatif) {
                 $errors[] = "Baris " . ($index + 1) . ": NIK \"$nik\" tidak ditemukan.";
                 continue;
             }
 
             foreach ($kodeKriterias as $colIndex => $kode_kriteria) {
                 $kode_kriteria = strtoupper(trim($kode_kriteria));
-                $value = $row[$colIndex + 2] ?? null; // +2 karena kolom C dst
+                $value = $row[$colIndex + 1] ?? null;
 
-                // Kolom tidak cukup
-                if (!isset($row[$colIndex + 2])) {
-                    $errors[] = "Baris " . ($index + 1) . ": Kolom untuk \"$kode_kriteria\" kosong.";
-                    continue;
-                }
-
-                // Validasi kriteria
-                if (!Kriteria::whereRaw('UPPER(kode_kriteria) = ?', [$kode_kriteria])->exists()) {
+                if (!Kriteria::where('kode_kriteria', $kode_kriteria)->exists()) {
                     $errors[] = "Baris " . ($index + 1) . ": Kode kriteria \"$kode_kriteria\" tidak valid.";
                     continue;
                 }
@@ -194,13 +195,13 @@ class NilaiController extends Controller
                     continue;
                 }
 
-                if (Nilai::where('tendik_nik', $nik)->where('kode_kriteria', $kode_kriteria)->exists()) {
+                if (Nilai::where('alternatif_nik', $nik)->where('kode_kriteria', $kode_kriteria)->exists()) {
                     $errors[] = "Baris " . ($index + 1) . ": Nilai NIK \"$nik\" & \"$kode_kriteria\" sudah ada.";
                     continue;
                 }
 
                 Nilai::create([
-                    'tendik_nik' => $nik,
+                    'alternatif_nik' => $nik,
                     'kode_kriteria' => $kode_kriteria,
                     'value' => (float) $value,
                     'created_at' => now(),
@@ -212,7 +213,7 @@ class NilaiController extends Controller
             }
         }
 
-        // LOG
+        // Logging
         $logText = now()->toDateTimeString() . " - IMPORT NILAI\n";
         $logText .= "Total berhasil: $inserted\n";
         $logText .= "Total gagal: " . count($errors) . "\n\n";
@@ -228,57 +229,49 @@ class NilaiController extends Controller
                 ->with('success', "$inserted nilai berhasil diimpor. " . count($errors) . " gagal.");
         }
 
-        return redirect('/nilai')->with('success', "$inserted nilai berhasil diimpor.");
+        return redirect('/nilai')->with('success', "$inserted data penilaian berhasil diimpor.");
     }
 
     public function export()
     {
         $kriterias = Kriteria::orderBy('kode_kriteria')->get();
-        $tendiks = Tendik::with('nilais')->get();
+        $alternatifs = Alternatif::with('nilais')->get();
 
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // Header kolom
         $sheet->setCellValue('A1', 'NIK');
-        $sheet->setCellValue('B1', 'NAMA');
 
         foreach ($kriterias as $index => $kriteria) {
-            $colLetter = Coordinate::stringFromColumnIndex($index + 3); // Mulai dari kolom C (karena A=NIK, B=NAMA)
-            $sheet->setCellValue("{$colLetter}1", strtoupper($kriteria->kode_kriteria));
+            $colLetter = Coordinate::stringFromColumnIndex($index + 2); // Kolom B++
+            $sheet->setCellValue("{$colLetter}1", strtoupper($kriteria->kode_kriteria)); // UPPERCASE
         }
 
-        // Data baris per tendik
+        // Data baris per Alternatif
         $row = 2;
-        foreach ($tendiks as $tendik) {
-            $sheet->setCellValue("A{$row}", $tendik->nik);
-            $sheet->setCellValue("B{$row}", $tendik->nama); // tambahkan nama
-
-            // Buat map nilai: KODE_KRITERIA => value
-            $nilaiMap = $tendik->nilais
-                ->mapWithKeys(function ($item) {
-                    return [strtoupper($item->kode_kriteria) => $item->value];
-                });
+        foreach ($alternatifs as $Alternatif) {
+            $sheet->setCellValue("A{$row}", $Alternatif->nik);
 
             foreach ($kriterias as $index => $kriteria) {
-                $colLetter = Coordinate::stringFromColumnIndex($index + 3); // Kolom C dst
-                $value = $nilaiMap->get(strtoupper($kriteria->kode_kriteria)) ?? '';
-                $sheet->setCellValue("{$colLetter}{$row}", $value);
+                $colLetter = Coordinate::stringFromColumnIndex($index + 2);
+                $nilai = $Alternatif->nilais->firstWhere('kode_kriteria', $kriteria->kode_kriteria);
+                $sheet->setCellValue("{$colLetter}{$row}", $nilai->value ?? '');
             }
 
             $row++;
         }
 
-        // Styling header
-        $lastCol = Coordinate::stringFromColumnIndex(count($kriterias) + 2); // +2 karena A dan B
+        // Styling header: abu-abu gelap + teks putih bold
+        $lastCol = Coordinate::stringFromColumnIndex(count($kriterias) + 1);
         $headerRange = "A1:{$lastCol}1";
 
-        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A0A0A0'); // abu
-        $sheet->getStyle($headerRange)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF'); // putih
+        $sheet->getStyle($headerRange)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('A0A0A0'); // grey
+        $sheet->getStyle($headerRange)->getFont()->setBold(true)->getColor()->setRGB('FFFFFF'); // white
 
         // Simpan dan download
         $writer = new Xlsx($spreadsheet);
-        $fileName = 'penilaian_tendik_' . now()->format('Ymd_His') . '.xlsx';
+        $fileName = 'penilaian_Alternatif_' . now()->format('Ymd_His') . '.xlsx';
         $path = tempnam(sys_get_temp_dir(), $fileName);
         $writer->save($path);
 

@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Hasil extends Model
 {
-    protected $fillable = ['tendik_nik', 'final_hasil', 'rank']; /* Kolom yang ada di table */
+    protected $fillable = ['alternatif_nik', 'final_hasil', 'rank'];
 
-    public function tendik()
+    public function Alternatif()
     {
-        return $this->belongsTo(Tendik::class, 'tendik_nik', 'nik');
+        return $this->belongsTo(Alternatif::class, 'alternatif_nik', 'nik');
     }
 }

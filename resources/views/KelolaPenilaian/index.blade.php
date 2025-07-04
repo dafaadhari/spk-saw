@@ -79,42 +79,42 @@
                                         </tr>
                                    </thead>
                                    <tbody>
-                                        @forelse($tendiks as $index => $tendik)
+                                        @forelse($alternatifs as $index => $Alternatif)
                                         <tr>
                                              <td>{{ $index + 1 }}</td>
-                                             <td>{{ $tendik->nik }}</td>
-                                             <td>{{ $tendik->nama }}</td>
+                                             <td>{{ $Alternatif->nik }}</td>
+                                             <td>{{ $Alternatif->nama }}</td>
 
                                              @foreach($kriterias as $kriteria)
                                              @php
                                              $kode = strtoupper($kriteria->kode_kriteria);
-                                             $nilai = $tendik->nilais->firstWhere(fn($n) => strtoupper($n->kode_kriteria) === $kode);
+                                             $nilai = $Alternatif->nilais->firstWhere(fn($n) => strtoupper($n->kode_kriteria) === $kode);
                                              @endphp
                                              <td class="text-center">{{ $nilai->value ?? '-' }}</td>
                                              @endforeach
 
                                              <td class="d-flex gap-2">
                                                   <!-- Tombol Edit -->
-                                                  <a href="{{ url('/nilai/tendik/' . $tendik->nik . '/edit') }}" class="btn btn-sm btn-primary" style="width:60px;">Edit</a>
+                                                  <a href="{{ url('/nilai/Alternatif/' . $Alternatif->nik . '/edit') }}" class="btn btn-sm btn-primary" style="width:60px;">Edit</a>
 
                                                   <!-- Tombol Hapus (trigger modal) -->
-                                                  <button type="button" class="btn btn-danger btn-sm" style="width:60px;" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $tendik->nik }}">
+                                                  <button type="button" class="btn btn-danger btn-sm" style="width:60px;" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $Alternatif->nik }}">
                                                        Hapus
                                                   </button>
 
                                                   <!-- Modal Konfirmasi Hapus -->
-                                                  <div class="modal fade" id="deleteModal{{ $tendik->nik }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $tendik->nik }}" aria-hidden="true">
+                                                  <div class="modal fade" id="deleteModal{{ $Alternatif->nik }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $Alternatif->nik }}" aria-hidden="true">
                                                        <div class="modal-dialog modal-dialog-centered">
                                                             <div class="modal-content">
                                                                  <div class="modal-header">
-                                                                      <h5 class="modal-title" id="deleteModalLabel{{ $tendik->nik }}">Konfirmasi Hapus</h5>
+                                                                      <h5 class="modal-title" id="deleteModalLabel{{ $Alternatif->nik }}">Konfirmasi Hapus</h5>
                                                                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                                                                  </div>
                                                                  <div class="modal-body">
-                                                                      Yakin ingin menghapus <strong>semua nilai</strong> untuk <strong>{{ $tendik->nama }}</strong>?
+                                                                      Yakin ingin menghapus <strong>semua nilai</strong> untuk <strong>{{ $Alternatif->nama }}</strong>?
                                                                  </div>
                                                                  <div class="modal-footer">
-                                                                      <form action="{{ url('/nilai/tendik/' . $tendik->nik) }}" method="POST">
+                                                                      <form action="{{ url('/nilai/Alternatif/' . $Alternatif->nik) }}" method="POST">
                                                                            @csrf
                                                                            @method('DELETE')
                                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>

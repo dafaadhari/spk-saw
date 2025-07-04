@@ -29,7 +29,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-    ]; /* Kolom yang ada di table */
+    ];
 
     /**
      * The attributes that should be hidden for serialization.

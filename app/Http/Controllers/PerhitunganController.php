@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Hasil;
 use App\Models\Kriteria;
-use App\Models\Tendik;
+use App\Models\Alternatif;
 use App\Models\Nilai;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -20,7 +20,7 @@ class PerhitunganController extends Controller
         $perPage = $request->input('entries', 10);
 
         $kriterias = Kriteria::all();
-        $tendiks = Tendik::all();
+        $alternatifs = Alternatif::all();
 
         // Hitung max value per kriteria
         $maxValues = [];
@@ -31,24 +31,24 @@ class PerhitunganController extends Controller
 
         $results = [];
 
-        foreach ($tendiks as $tendik) {
+        foreach ($alternatifs as $Alternatif) {
             $nilai_akhir = 0;
             foreach ($kriterias as $kriteria) {
-                $nilai = Nilai::where('tendik_nik', $tendik->nik)
+                $nilai = Nilai::where('alternatif_nik', $Alternatif->nik) /* Untuk Mencocokan Nilai antara Data Kriteria dengan Data Alternatif dan Tendik(NIK)*/
                     ->where('kode_kriteria', $kriteria->kode_kriteria)
-                    ->first();
+                    ->first(); /* Mengambil  data perbaris */
 
                 if ($nilai) {
-                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria];
-                    $nilai_akhir += $kriteria->weight * $normalized;
+                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria]; /* Normalisasi, Dibagi Nilai Maximum Perkriteria*/
+                    $nilai_akhir += $kriteria->weight * $normalized; /* Hitung Hasil Akhir, Hasil Normalisasi x Bobot + Hasil Semua Nilai Kriteria*/
                 }
             }
 
             $results[] = [
-                'tendik_nik' => $tendik->nik,
-                'nama' => $tendik->nama,
+                'alternatif_nik' => $Alternatif->nik,
+                'nama' => $Alternatif->nama,
                 'nilai_akhir' => round($nilai_akhir, 4),
-                'jam_kerja_bulanan' => floatval($tendik->jam_kerja_bulanan),
+                'jam_kerja_bulanan' => floatval($Alternatif->jam_kerja_bulanan),
             ];
         }
 
@@ -60,7 +60,7 @@ class PerhitunganController extends Controller
             $res['rank'] = $index + 1;
 
             Hasil::create([
-                'tendik_nik' => $res['tendik_nik'],
+                'alternatif_nik' => $res['alternatif_nik'],
                 'final_hasil' => $res['nilai_akhir'],
                 'rank' => $res['rank'],
             ]);
@@ -69,7 +69,7 @@ class PerhitunganController extends Controller
         // Pencarian
         $filtered = array_filter($results, function ($item) use ($search) {
             if (!$search) return true;
-            return str_contains(strtolower($item['tendik_nik'] . $item['nama']), strtolower($search));
+            return str_contains(strtolower($item['alternatif_nik'] . $item['nama']), strtolower($search));
         });
 
         // Pisahkan lolos dan eliminasi
@@ -82,7 +82,7 @@ class PerhitunganController extends Controller
 
         // Paginate manual
         // $lolosPaginator = $this->paginateArray(array_values($lolos), $perPage, $request, 'lolos_page');
-        $lolosPaginator = collect(array_values($lolos)); 
+        $lolosPaginator = collect(array_values($lolos));
         $eliminasiPaginator = $this->paginateArray(array_values($eliminasi), $perPage, $request, 'eliminasi_page');
 
         // dd($lolosPaginator, $eliminasi);
@@ -113,7 +113,7 @@ class PerhitunganController extends Controller
     public function cetakPDF()
     {
         $kriterias = Kriteria::all();
-        $tendiks = Tendik::all();
+        $alternatifs = Alternatif::all();
 
         // Ambil nilai maksimum untuk setiap kriteria
         $maxValues = [];
@@ -124,26 +124,26 @@ class PerhitunganController extends Controller
 
         $results = [];
 
-        // Hitung nilai akhir SAW untuk setiap tendik
-        foreach ($tendiks as $tendik) {
+        // Hitung nilai akhir SAW untuk setiap Alternatif
+        foreach ($alternatifs as $Alternatif) {
             $nilai_akhir = 0;
 
             foreach ($kriterias as $kriteria) {
-                $nilai = Nilai::where('tendik_nik', $tendik->nik) /* Untuk Mencocokan Nilai antara Data Kriteria dengan Data Alternatif dan Tendik(NIK)*/
+                $nilai = Nilai::where('alternatif_nik', $Alternatif->nik)
                     ->where('kode_kriteria', $kriteria->kode_kriteria)
-                    ->first(); /* Mengambil  data perbaris */
+                    ->first();
 
                 if ($nilai) {
-                    $hasilnormalized = $nilai->value / $maxValues[$kriteria->kode_kriteria]; /* Normalisasi, Dibagi Nilai Maximum Perkriteria*/
-                    $nilai_akhir += $hasilnormalized * $kriteria->weight; /* Hitung Hasil Akhir, Hasil Normalisasi x Bobot + Hasil Semua Nilai Kriteria*/
+                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria];
+                    $nilai_akhir += $kriteria->weight * $normalized;
                 }
             }
 
             $results[] = [
-                'tendik_nik' => $tendik->nik,
-                'nama' => $tendik->nama,
+                'alternatif_nik' => $Alternatif->nik,
+                'nama' => $Alternatif->nama,
                 'nilai_akhir' => round($nilai_akhir, 4),
-                'jam_kerja_bulanan' => floatval($tendik->jam_kerja_bulanan),
+                'jam_kerja_bulanan' => floatval($Alternatif->jam_kerja_bulanan),
             ];
         }
 
@@ -157,7 +157,7 @@ class PerhitunganController extends Controller
             $res['rank'] = $index + 1;
 
             Hasil::create([
-                'tendik_nik' => $res['tendik_nik'],
+                'alternatif_nik' => $res['alternatif_nik'],
                 'final_hasil' => $res['nilai_akhir'],
                 'rank' => $res['rank'],
             ]);

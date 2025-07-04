@@ -53,14 +53,16 @@
                     </div>
 
                     {{-- SECTION: Delete Account --}}
+                    {{--
                     @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                    <div class="card mb-4 border-danger">
-                        <div class="card-body">
-                            <h4 class="mb-3 text-danger">Hapus Akun</h4>
-                            @livewire('profile.delete-user-form')
+                        <div class="card mb-4 border-danger">
+                            <div class="card-body">
+                                <h4 class="mb-3 text-danger">Hapus Akun</h4>
+                                @livewire('profile.delete-user-form')
+                            </div>
                         </div>
-                    </div>
-                    @endif
+                    @endif 
+                    --}}
                 </div>
             </div>
         </div>

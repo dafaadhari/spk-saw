@@ -27,8 +27,8 @@
                     <li class="nav-link {{ Request::is('kriteria*') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/kriteria') }}">Kelola Bobot Kriteria</a>
                     </li>
-                    <li class="nav-link {{ Request::is('tendik*') ? 'active fw-bold' : '' }}">
-                        <a href="{{ url('/tendik') }}">Kelola Data Tendik</a>
+                    <li class="nav-link {{ Request::is('Alternatif*') ? 'active fw-bold' : '' }}">
+                        <a href="{{ url('/Alternatif') }}">Kelola Data Alternatif</a>
                     </li>
                     <li class="nav-link {{ Request::is('nilai*') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/nilai') }}">Kelola Penilaian</a>

@@ -45,7 +45,7 @@
                         </a>
                     </div>
                     <div class="col-xl-3 col-lg-6 col-md-12 col-12 mb-5">
-                        <a href="{{ url('/tendik') }}" class="text-decoration-none text-dark">
+                        <a href="{{ url('/Alternatif') }}" class="text-decoration-none text-dark">
                             <!-- card -->
                             <div class="card h-100 card-lift">
                                 <!-- card body -->
@@ -53,7 +53,7 @@
                                     <!-- heading -->
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="text-dark">
-                                            <h4 class="mb-0">Kelola Data Tendik</h4>
+                                            <h4 class="mb-0">Kelola Data Alternatif</h4>
                                         </div>
                                         <div class="icon-shape icon-md bg-primary-soft text-dark rounded-2">
                                             <i data-feather="users" height="20" width="20"></i>
@@ -61,11 +61,11 @@
                                     </div>
                                     <!-- content -->
                                     <div class="lh-1 text-dark">
-                                        @if ($tendikCount > 0)
-                                            <h1 class="mb-1 fw-bold">{{ $tendikCount }}</h1>
-                                            <p class="mb-0">Total Pegawai Tendik</p>
+                                        @if ($AlternatifCount > 0)
+                                            <h1 class="mb-1 fw-bold">{{ $AlternatifCount }}</h1>
+                                            <p class="mb-0">Total Pegawai Alternatif</p>
                                         @else
-                                            <p class="mb-0">Tidak ada data tendik.</p>
+                                            <p class="mb-0">Tidak ada data Alternatif.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -139,7 +139,7 @@
                                                     <div>
                                                         <span class="fw-semibold text-dark">Rank
                                                             {{ $rank->rank }}</span><br>
-                                                        <small class="text-dark">{{ $rank->tendik->nama ?? '-' }}</small>
+                                                        <small class="text-dark">{{ $rank->Alternatif->nama ?? '-' }}</small>
                                                     </div>
                                                     <div class="text-end">
                                                         <span

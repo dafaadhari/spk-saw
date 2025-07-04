@@ -58,7 +58,7 @@
 
                             <tr x-show="showAll || {{ $index < 10 ? 'true' : 'false' }}">
                             <td>{{ $loop->iteration }}</td>
-                            <td class="{{ $warna }}">{{ $row['tendik_nik'] }}</td>
+                            <td class="{{ $warna }}">{{ $row['alternatif_nik'] }}</td>
                             <td class="{{ $warna }}">{{ $row['nama'] }}</td>
                             <td class="{{ $warna }}">{{ number_format($row['nilai_akhir'], 4) }}</td>
                             <td class="{{ $warna }}">{{ $row['rank'] }}</td>
@@ -100,7 +100,7 @@
                         @forelse ($eliminasi as $index => $row)
                         <tr>
                             <td>{{ $eliminasi->firstItem() + $index }}</td>
-                            <td class="bg-warning text-dark">{{ $row['tendik_nik'] }}</td>
+                            <td class="bg-warning text-dark">{{ $row['alternatif_nik'] }}</td>
                             <td class="bg-warning text-dark">{{ $row['nama'] }}</td>
                             <td class="bg-warning text-dark">{{ number_format($row['nilai_akhir'], 4) }}</td>
                             <td class="bg-warning text-dark">{{ $row['rank'] }}</td>
