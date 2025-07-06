@@ -25,10 +25,10 @@
                         <a href="{{ url('/dashboard') }}">Dashboard</a>
                     </li>
                     <li class="nav-link {{ Request::is('kriteria*') ? 'active fw-bold' : '' }}">
-                        <a href="{{ url('/kriteria') }}">Kelola Bobot Kriteria</a>
+                        <a href="{{ url('/kriteria') }}">Kelola Kriteria</a>
                     </li>
                     <li class="nav-link {{ Request::is('Alternatif*') ? 'active fw-bold' : '' }}">
-                        <a href="{{ url('/Alternatif') }}">Kelola Data Alternatif</a>
+                        <a href="{{ url('/Alternatif') }}">Kelola Alternatif</a>
                     </li>
                     <li class="nav-link {{ Request::is('nilai*') ? 'active fw-bold' : '' }}">
                         <a href="{{ url('/nilai') }}">Kelola Penilaian</a>
