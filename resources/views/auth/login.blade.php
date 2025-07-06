@@ -44,12 +44,12 @@
             </div>
         </form>
 
-        <div class="mt-4 text-center">
+        <!-- <div class="mt-4 text-center">
             <hr class="mb-2">
             <span class="text-sm text-gray-600">Belum punya akun?</span>
-            <a href="{{ route('register') }}" class="ml-2 text-sm text-indigo-600 hover:underline">
+            <a href="#" class="ml-2 text-sm text-indigo-600 hover:underline">
                 Daftar Sekarang
             </a>
-        </div>
+        </div> -->
     </x-authentication-card>
 </x-guest-layout>

@@ -11,6 +11,9 @@ use App\Http\Controllers\ResetPasswordController;
 Route::get('/', function () {
     return view('auth.login');
 });
+Route::get('/register', function () {
+    return view('auth.login');
+});
 
 Route::post('/send-otp', [ResetPasswordController::class, 'sendOtp'])->name('password.email');
 Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOtp'])->name('password.verify.otp');
