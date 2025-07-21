@@ -33,12 +33,12 @@
                               </div>
                               <div class="d-flex flex-wrap gap-2">
                                    <a href="{{ url('/nilai/create') }}" class="btn btn-white">+ Tambah Data</a>
-                                   <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalImport">
+                                   <!-- <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#modalImport">
                                         <i class="bi bi-file-earmark-arrow-down me-1"></i> Import Excel
                                    </button>
                                    <a href="{{ url('/nilai/export') }}" class="btn btn-success">
                                         <i class="bi bi-file-earmark-arrow-up me-1"></i> Export Excel
-                                   </a>
+                                   </a> -->
                               </div>
                          </div>
                     </div>

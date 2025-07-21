@@ -14,20 +14,22 @@
                 -webkit-print-color-adjust: exact;
             }
 
-            .bg-success {
-                background-color: #198754 !important;
-                color: white !important;
+            .table-primary {
+                background-color: #b6d4fe !important;
+                color: #222 !important;
             }
 
-            .bg-warning {
-                background-color: #ffc107 !important;
-                color: black !important;
+            .table-success {
+                background-color: #d1e7dd !important;
             }
+        }
 
-            .bg-primary {
-                background-color: #0d6efd !important;
-                color: white !important;
-            }
+        .table-primary {
+            background-color: #b6d4fe !important;
+        }
+
+        .table-success {
+            background-color: #d1e7dd !important;
         }
     </style>
 </head>
@@ -36,65 +38,41 @@
 
     <h2 class="text-center fw-bold mb-4">Laporan Hasil Perhitungan SAW</h2>
 
-    <!-- Tabel Lolos -->
-    <h5 class="fw-bold">Alternatif Lolos </h5>
-    <table class="table table-bordered align-middle text-center mb-5 table-sm">
-        <thead class="table-light">
-            <tr>
-                <th>No</th>
-                <th>NIK Alternatif</th>
-                <th>Nama Alternatif</th>
-                <th>Nilai SAW</th>
-                <th>Ranking</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($lolos as $index => $row)
-            @php
-            $rowClass = $row['rank'] <= 4 ? 'bg-success' : 'bg-primary' ;
-                @endphp
-                <tr class="{{ $rowClass }}">
-                <td class="{{$rowClass}}">{{ $index + 1 }}</td>
-                <td class="{{$rowClass}}">{{ $row['alternatif_nik'] }}</td>
-                <td class="{{$rowClass}}">{{ $row['nama'] }}</td>
-                <td class="{{$rowClass}}">{{ number_format($row['nilai_akhir'], 4) }}</td>
-                <td class="{{$rowClass}}">{{ $row['rank'] }}</td>
-                </tr>
-                @endforeach
-                @if (count($lolos) === 0)
-                <tr>
-                    <td colspan="5" class="text-center">Tidak ada data.</td>
-                </tr>
-                @endif
-        </tbody>
-    </table>
-
-    <!-- Tabel Tereliminasi -->
-    <h5 class="fw-bold">Alternatif Tereliminasi </h5>
+    <h5 class="fw-bold">Tabel Perangkingan Alternatif</h5>
     <table class="table table-bordered align-middle text-center table-sm">
-        <thead class="table-light">
+        <thead class="table-primary">
             <tr>
-                <th>No</th>
-                <th>NIK Alternatif</th>
                 <th>Nama Alternatif</th>
-                <th>Nilai SAW</th>
-                <th>Ranking</th>
+                @foreach ($kriterias as $k)
+                    <th>{{ $k->nama }}</th>
+                @endforeach
+                <th>Total</th>
+                <th>Rank</th>
+            </tr>
+            <tr>
+                <th>Bobot</th>
+                @foreach ($kriterias as $k)
+                    <th>{{ $k->weight }}</th>
+                @endforeach
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach ($eliminasi as $index => $row)
-            <tr class="bg-warning">
-                <td class="bg-warning">{{ $index + 1 }}</td>
-                <td class="bg-warning">{{ $row['alternatif_nik'] }}</td>
-                <td class="bg-warning">{{ $row['nama'] }}</td>
-                <td class="bg-warning">{{ number_format($row['nilai_akhir'], 4) }}</td>
-                <td class="bg-warning">{{ $row['rank'] }}</td>
-            </tr>
+            @foreach ($perangkingan as $row)
+                <tr @if ($row['rank'] !== '-' && $row['rank'] <= 4) class="table" @endif>
+                    <td>{{ $alternatifs->where('nik', $row['nik'])->first()->nama ?? $row['nik'] }}</td>
+                    @foreach ($kriterias as $k)
+                        <td>{{ $row[$k->kode_kriteria] ?? 0 }}</td>
+                    @endforeach
+                    <td><strong>{{ $row['total'] }}</strong></td>
+                    <td>{{ $row['rank'] }}</td>
+                </tr>
             @endforeach
-            @if (count($eliminasi) === 0)
-            <tr>
-                <td colspan="5" class="text-center">Tidak ada data.</td>
-            </tr>
+            @if (count($perangkingan) === 0)
+                <tr>
+                    <td colspan="{{ count($kriterias) + 3 }}" class="text-center">Tidak ada data.</td>
+                </tr>
             @endif
         </tbody>
     </table>
