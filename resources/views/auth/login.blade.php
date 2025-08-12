@@ -54,7 +54,11 @@
         </form>
 
         <div id="modal-error" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+<<<<<<< HEAD
             <div class="bg-white rounded-md shadow-xl p-6 w-[50%] max-w-lg mx-auto">
+=======
+            <div class="bg-white rounded-lg shadow-xl p-6 w-[90%] max-w-lg mx-auto">
+>>>>>>> 956f691e616b726bbe8958d95882e92e0d33e382
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-semibold text-red-600">Oops!</h3>
                     <button onclick="closeModal()" class="text-gray-500 hover:text-gray-800 text-xl">&times;</button>

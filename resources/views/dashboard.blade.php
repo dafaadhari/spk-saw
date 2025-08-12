@@ -16,14 +16,14 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Row card overview -->
                 <div class="row">
+                    <!-- Card Kriteria -->
                     <div class="col-xl-3 col-lg-6 col-md-12 col-12 mb-5">
                         <a href="{{ url('/kriteria') }}" class="text-decoration-none text-dark">
-                            <!-- card -->
                             <div class="card h-100 card-lift">
-                                <!-- card body -->
                                 <div class="card-body">
-                                    <!-- heading -->
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="text-dark">
                                             <h4 class="mb-0">Kelola Bobot Kriteria</h4>
@@ -32,7 +32,7 @@
                                             <i data-feather="sliders" height="20" width="20"></i>
                                         </div>
                                     </div>
-                                    <div class="lh-1 text-dark">
+                                    <div class="lh-1 text-dark">        
                                         @if ($kriteriaCount > 0)
                                             <h1 class="mb-1 fw-bold">{{ $kriteriaCount }}</h1>
                                             <p class="mb-0">Total Kriteria</p>
@@ -44,13 +44,12 @@
                             </div>
                         </a>
                     </div>
+
+                    <!-- Card Alternatif -->
                     <div class="col-xl-3 col-lg-6 col-md-12 col-12 mb-5">
                         <a href="{{ url('/Alternatif') }}" class="text-decoration-none text-dark">
-                            <!-- card -->
                             <div class="card h-100 card-lift">
-                                <!-- card body -->
                                 <div class="card-body">
-                                    <!-- heading -->
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="text-dark">
                                             <h4 class="mb-0">Kelola Data Alternatif</h4>
@@ -59,7 +58,6 @@
                                             <i data-feather="users" height="20" width="20"></i>
                                         </div>
                                     </div>
-                                    <!-- content -->
                                     <div class="lh-1 text-dark">
                                         @if ($AlternatifCount > 0)
                                             <h1 class="mb-1 fw-bold">{{ $AlternatifCount }}</h1>
@@ -72,13 +70,12 @@
                             </div>
                         </a>
                     </div>
+
+                    <!-- Card Penilaian -->
                     <div class="col-xl-3 col-lg-6 col-md-12 col-12 mb-5">
                         <a href="{{ url('/nilai') }}" class="text-decoration-none text-dark">
-                            <!-- card -->
                             <div class="card h-100 card-lift">
-                                <!-- card body -->
                                 <div class="card-body">
-                                    <!-- heading -->
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <div class="text-dark">
                                             <h4 class="mb-0">Kelola Penilaian</h4>
@@ -99,10 +96,11 @@
                             </div>
                         </a>
                     </div>
+
+                    <!-- Card Lihat Perhitungan -->
                     <div class="col-xl-3 col-lg-6 col-md-12 col-12 mb-5">
                         <div class="card h-100 card-lift">
                             <div class="card-body">
-                                <!-- Heading -->
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
                                         <h4 class="mb-0">
@@ -122,8 +120,6 @@
                                             <h1 class="mb-1 fw-bold">{{ $perhitunganCount }}</h1>
                                             <p class="mb-2 text-dark">Total Hasil Perhitungan</p>
                                         </a>
-
-                                        <!-- Top 5 + toggle button -->
                                         <div class="d-flex justify-content-between align-items-center">
                                             <p class="mb-2 text-dark">Top 5 Hasil Perhitungan</p>
                                             <button class="btn btn-sm p-0 border-0 bg-transparent text-dark" type="button"
@@ -132,18 +128,15 @@
                                                 <i data-feather="chevron-down"></i>
                                             </button>
                                         </div>
-
                                         <div class="collapse" id="topRankList">
                                             @foreach ($rankCounts as $rank)
                                                 <div class="d-flex justify-content-between mb-3">
                                                     <div>
-                                                        <span class="fw-semibold text-dark">Rank
-                                                            {{ $rank->rank }}</span><br>
+                                                        <span class="fw-semibold text-dark">Rank {{ $rank->rank }}</span><br>
                                                         <small class="text-dark">{{ $rank->Alternatif->nama ?? '-' }}</small>
                                                     </div>
                                                     <div class="text-end">
-                                                        <span
-                                                            class="badge bg-light text-dark">{{ $rank->final_hasil }}</span>
+                                                        <span class="badge bg-light text-dark">{{ $rank->final_hasil }}</span>
                                                     </div>
                                                 </div>
                                             @endforeach
@@ -155,5 +148,47 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            @endsection
+                </div> <!-- penutup row card overview -->
+
+                <!-- Card Spk & SAW -->
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-5">
+                        <div class="card card-lift">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="text-dark">
+                                        <h2 class="mb-0">Sistem Pendukung Keputusan</h2>
+                                    </div>
+                                </div>
+                                <p class="mb-0 text-dark">
+                                    Sistem pendukung keputusan (SPK) adalah sistem berbasis komputer yang dibuat untuk membantu para pengambil keputusan manajerial, 
+                                    terutama dalam situasi yang membutuhkan penyelidikan dan pertimbangan yang lebih menyeluruh.  
+                                    Untuk membuat penilaian yang lebih baik dan berguna, SPK ini mencoba membantu pengambil keputusan 
+                                    dalam memilih tindakan terbaik berdasarkan berbagai kriteria terkait, termasuk data, model, dan informasi lainnya. (Prayoga & Utami, 2021).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-12 col-lg-12 col-md-12 col-12 mb-5">
+                        <div class="card card-lift">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="text-dark">
+                                        <h2 class="mb-0">Metode Simple Additive Weighting</h2>
+                                    </div>
+                                </div>
+                                <p class="mb-0 text-dark">
+                                    Proses pengambilan keputusan yang disebut <em>Simple Additive Weighting</em> (SAW) 
+                                    menggunakan sejumlah kriteria sederhana dan tradisional.  
+                                    Teknik ini, yang juga dikenal sebagai penjumlahan terbobot, 
+                                    menggunakan metodologi pembobotan langsung.  
+                                    Tujuan utama metode SAW adalah untuk menentukan peringkat kinerja terbobot setiap alternatif 
+                                    secara keseluruhan berdasarkan semua kualitas yang tersedia. (Asminah, 2022).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+                <!-- Close tag Card Spk & SAW -->
+
+@endsection

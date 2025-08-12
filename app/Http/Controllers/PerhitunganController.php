@@ -22,43 +22,72 @@ class PerhitunganController extends Controller
         $kriterias = Kriteria::all();
         $alternatifs = Alternatif::all();
 
-        // Hitung max value per kriteria
+        // Nilai max per kriteria
         $maxValues = [];
         foreach ($kriterias as $kriteria) {
             $max = Nilai::where('kode_kriteria', $kriteria->kode_kriteria)->max('value');
             $maxValues[$kriteria->kode_kriteria] = $max > 0 ? $max : 1;
         }
 
+        // Analisa Kualitatif
+        $analisa_kualitatif = [];
+        foreach ($alternatifs as $alt) {
+            $row = ['nama' => $alt->nama];
+            foreach ($kriterias as $k) {
+                $nilai = Nilai::where('alternatif_nik', $alt->nik)->where('kode_kriteria', $k->kode_kriteria)->first();
+                $row[$k->kode_kriteria] = $nilai ? $nilai->value : '-';
+            }
+            $analisa_kualitatif[] = $row;
+        }
+
+        // Skoring Kuantitatif
+        $skoring_kuantitatif = [];
+        foreach ($alternatifs as $alt) {
+            $row = ['nik' => $alt->nik];
+            foreach ($kriterias as $k) {
+                $nilai = Nilai::where('alternatif_nik', $alt->nik)->where('kode_kriteria', $k->kode_kriteria)->first();
+                $row[$k->kode_kriteria] = $nilai ? $nilai->value : 0;
+            }
+            $skoring_kuantitatif[] = $row;
+        }
+
+        // Normalisasi & perangkingan
         $results = [];
+        $normalisasi = [];
+        $perangkingan = [];
 
-        foreach ($alternatifs as $Alternatif) {
-            $nilai_akhir = 0;
-            foreach ($kriterias as $kriteria) {
-                $nilai = Nilai::where('alternatif_nik', $Alternatif->nik) /* Untuk Mencocokan Nilai antara Data Kriteria dengan Data Alternatif dan Tendik(NIK)*/
-                    ->where('kode_kriteria', $kriteria->kode_kriteria)
-                    ->first(); /* Mengambil  data perbaris */
+        foreach ($alternatifs as $alt) {
+            $total = 0;
+            $row_norm = ['nik' => $alt->nik];
+            $row_bobot = ['nik' => $alt->nik];
 
-                if ($nilai) {
-                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria]; /* Normalisasi, Dibagi Nilai Maximum Perkriteria*/
-                    $nilai_akhir += $kriteria->weight * $normalized; /* Hitung Hasil Akhir, Hasil Normalisasi x Bobot + Hasil Semua Nilai Kriteria*/
-                }
+            foreach ($kriterias as $k) {
+                $nilai = Nilai::where('alternatif_nik', $alt->nik)->where('kode_kriteria', $k->kode_kriteria)->first();
+                $val = $nilai ? $nilai->value : 0;
+                $norm = $val / $maxValues[$k->kode_kriteria];
+                $bobot = $norm * $k->weight;
+
+                $row_norm[$k->kode_kriteria] = round($norm, 2);
+                $row_bobot[$k->kode_kriteria] = round($bobot, 4);
+                $total += $bobot;
             }
 
+            $row_bobot['total'] = round($total, 4);
+            $normalisasi[] = $row_norm;
+            $perangkingan[] = $row_bobot;
+
             $results[] = [
-                'alternatif_nik' => $Alternatif->nik,
-                'nama' => $Alternatif->nama,
-                'nilai_akhir' => round($nilai_akhir, 4),
-                'jam_kerja_bulanan' => floatval($Alternatif->jam_kerja_bulanan),
+                'alternatif_nik' => $alt->nik,
+                'nama' => $alt->nama,
+                'nilai_akhir' => round($total, 4),
+                'jam_kerja_bulanan' => floatval($alt->jam_kerja_bulanan),
             ];
         }
 
         usort($results, fn($a, $b) => $b['nilai_akhir'] <=> $a['nilai_akhir']);
-
-        // Simpan ranking ke DB
         Hasil::truncate();
-        foreach ($results as $index => &$res) {
-            $res['rank'] = $index + 1;
-
+        foreach ($results as $i => &$res) {
+            $res['rank'] = $i + 1;
             Hasil::create([
                 'alternatif_nik' => $res['alternatif_nik'],
                 'final_hasil' => $res['nilai_akhir'],
@@ -66,31 +95,52 @@ class PerhitunganController extends Controller
             ]);
         }
 
-        // Pencarian
-        $filtered = array_filter($results, function ($item) use ($search) {
-            if (!$search) return true;
-            return str_contains(strtolower($item['alternatif_nik'] . $item['nama']), strtolower($search));
-        });
-
-        // Pisahkan lolos dan eliminasi
+        $filtered = array_filter($results, fn($item) => !$search || str_contains(strtolower($item['alternatif_nik'] . $item['nama']), strtolower($search)));
         $lolos = array_filter($filtered, fn($r) => $r['jam_kerja_bulanan'] >= 160);
         $eliminasi = array_filter($filtered, fn($r) => $r['jam_kerja_bulanan'] < 160);
-
-        // Urutkan berdasarkan rank agar tampilan sesuai
         usort($lolos, fn($a, $b) => $a['rank'] <=> $b['rank']);
-        usort($eliminasi, fn($a, $b) => $b['rank'] <=> $a['rank']);
+        usort($eliminasi, fn($a, $b) => $a['rank'] <=> $b['rank']);
 
-        // Paginate manual
-        // $lolosPaginator = $this->paginateArray(array_values($lolos), $perPage, $request, 'lolos_page');
-        $lolosPaginator = collect(array_values($lolos));
-        $eliminasiPaginator = $this->paginateArray(array_values($eliminasi), $perPage, $request, 'eliminasi_page');
+        // --- Perangkingan dan Normalisasi (sudah ada di kode lama) ---
+        $perangkingan = [];
+        foreach ($alternatifs as $alt) {
+            $total = 0;
+            $row_bobot = ['nik' => $alt->nik];
+            foreach ($kriterias as $k) {
+                $nilai = Nilai::where('alternatif_nik', $alt->nik)->where('kode_kriteria', $k->kode_kriteria)->first();
+                $val = $nilai ? $nilai->value : 0;
+                $norm = $val / $maxValues[$k->kode_kriteria];
+                $bobot = $norm * $k->weight;
+                $row_bobot[$k->kode_kriteria] = round($bobot, 4);
+                $total += $bobot;
+            }
+            $row_bobot['total'] = round($total, 4);
+            $perangkingan[] = $row_bobot;
+        }
 
-        // dd($lolosPaginator, $eliminasi);
+        // --- SORT & ASSIGN RANK ---
+        // Urutkan berdasarkan total (DESC)
+        usort($perangkingan, function ($a, $b) {
+            return $b['total'] <=> $a['total'];
+        });
+        // Assign Rank
+        foreach ($perangkingan as $i => &$row) {
+            $row['rank'] = $row['total'] > 0 ? $i + 1 : '-';
+        }
+        unset($row); // reference safety
+
+        // --- PASSING DATA KE VIEW ---
         return view('LihatPerhitungan.index', [
-            'lolos' => $lolosPaginator,
-            'eliminasi' => $eliminasiPaginator,
             'search' => $search,
-            'entries' => $perPage
+            'entries' => $perPage,
+            'kriterias' => $kriterias,
+            'alternatifs' => $alternatifs,
+            'analisa_kualitatif' => $analisa_kualitatif,
+            'skoring_kuantitatif' => $skoring_kuantitatif,
+            'normalisasi' => $normalisasi,
+            'perangkingan' => $perangkingan,
+            'lolos' => collect(array_values($lolos)),
+            'eliminasi' => $this->paginateArray(array_values($eliminasi), $perPage, $request, 'eliminasi_page'),
         ]);
     }
 
@@ -98,10 +148,8 @@ class PerhitunganController extends Controller
     {
         $page = LengthAwarePaginator::resolveCurrentPage($pageName);
         $offset = ($page - 1) * $perPage;
-        $paginatedItems = array_slice($items, $offset, $perPage);
-
         return new LengthAwarePaginator(
-            $paginatedItems,
+            array_slice($items, $offset, $perPage),
             count($items),
             $perPage,
             $page,
@@ -110,65 +158,61 @@ class PerhitunganController extends Controller
     }
 
 
+
     public function cetakPDF()
     {
         $kriterias = Kriteria::all();
         $alternatifs = Alternatif::all();
 
-        // Ambil nilai maksimum untuk setiap kriteria
+        // Nilai max per kriteria
         $maxValues = [];
         foreach ($kriterias as $kriteria) {
             $max = Nilai::where('kode_kriteria', $kriteria->kode_kriteria)->max('value');
             $maxValues[$kriteria->kode_kriteria] = $max > 0 ? $max : 1;
         }
 
-        $results = [];
-
-        // Hitung nilai akhir SAW untuk setiap Alternatif
-        foreach ($alternatifs as $Alternatif) {
-            $nilai_akhir = 0;
-
-            foreach ($kriterias as $kriteria) {
-                $nilai = Nilai::where('alternatif_nik', $Alternatif->nik)
-                    ->where('kode_kriteria', $kriteria->kode_kriteria)
-                    ->first();
-
-                if ($nilai) {
-                    $normalized = $nilai->value / $maxValues[$kriteria->kode_kriteria];
-                    $nilai_akhir += $kriteria->weight * $normalized;
-                }
+        // Hitung perangkingan
+        $perangkingan = [];
+        foreach ($alternatifs as $alt) {
+            $total = 0;
+            $row_bobot = ['nik' => $alt->nik];
+            foreach ($kriterias as $k) {
+                $nilai = Nilai::where('alternatif_nik', $alt->nik)->where('kode_kriteria', $k->kode_kriteria)->first();
+                $val = $nilai ? $nilai->value : 0;
+                $norm = $val / $maxValues[$k->kode_kriteria];
+                $bobot = $norm * $k->weight;
+                $row_bobot[$k->kode_kriteria] = round($bobot, 4);
+                $total += $bobot;
             }
-
-            $results[] = [
-                'alternatif_nik' => $Alternatif->nik,
-                'nama' => $Alternatif->nama,
-                'nilai_akhir' => round($nilai_akhir, 4),
-                'jam_kerja_bulanan' => floatval($Alternatif->jam_kerja_bulanan),
-            ];
+            $row_bobot['total'] = round($total, 4);
+            $perangkingan[] = $row_bobot;
         }
 
-        // Urutkan berdasarkan nilai akhir secara menurun
-        usort($results, fn($a, $b) => $b['nilai_akhir'] <=> $a['nilai_akhir']);
+        // Urutkan by total DESC
+        usort($perangkingan, function ($a, $b) {
+            return $b['total'] <=> $a['total'];
+        });
 
-        // Simpan ranking dan hasil ke database
-        Hasil::truncate();
-
-        foreach ($results as $index => &$res) {
-            $res['rank'] = $index + 1;
-
-            Hasil::create([
-                'alternatif_nik' => $res['alternatif_nik'],
-                'final_hasil' => $res['nilai_akhir'],
-                'rank' => $res['rank'],
-            ]);
+        // Assign Rank (Rank 1,2,... yang total>0, sisanya '-')
+        $curRank = 1;
+        foreach ($perangkingan as &$row) {
+            $row['rank'] = $row['total'] > 0 ? $curRank++ : '-';
         }
-        // Tambahkan ini sebelum return
-        $lolos = array_filter($results, fn($r) => $r['jam_kerja_bulanan'] >= 160);
-        $eliminasi = array_filter($results, fn($r) => $r['jam_kerja_bulanan'] < 160);
+        unset($row);
 
+        // Urut ulang sesuai Rank ASC (angka dulu, baru '-')
+        usort($perangkingan, function ($a, $b) {
+            if ($a['rank'] == '-' && $b['rank'] == '-') return 0;
+            if ($a['rank'] == '-') return 1;
+            if ($b['rank'] == '-') return -1;
+            return $a['rank'] <=> $b['rank'];
+        });
+
+        // Passing ke view
         return view('LihatPerhitungan.cetakPDF', [
-            'lolos' => array_values($lolos),
-            'eliminasi' => array_values($eliminasi),
+            'perangkingan' => $perangkingan,
+            'kriterias' => $kriterias,
+            'alternatifs' => $alternatifs,
         ]);
     }
 }

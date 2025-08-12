@@ -1,6 +1,6 @@
 @extends('layouts.app')
-
 <title>Lihat Perhitungan | Sistem Pendukung Keputusan</title>
+
 @section('content')
 <div id="app-content">
     <div class="app-content-area pt-0">
@@ -13,109 +13,184 @@
             </div>
             <form method="GET" action="/lihatPerhitungan" class="row mb-3 align-items-center">
                 <div class="col-md-8 mb-2">
-                    <label class="d-flex align-items-center gap-2 flex-wrap text-white">
-                        Show
-                        <select name="entries" class="form-select d-inline w-auto">
-                            @foreach([5, 10, 25, 50, 100] as $val)
-                            <option value="{{ $val }}" {{ $entries == $val ? 'selected' : '' }}>{{ $val }}</option>
-                            @endforeach
-                        </select>
-                        entries
-                    </label>
+
                 </div>
                 <div class="col-md-4 d-flex">
                     <input type="text" name="search" class="form-control me-2" value="{{ $search }}" placeholder="Cari...">
                     <button type="submit" class="btn btn-light">Cari</button>
                 </div>
             </form>
-            <div class="alert alert-warning fw-bold text-center">
+            <!-- <div class="alert alert-warning fw-bold text-center">
                 <span class="badge bg-success">Hijau = Top 4</span>
                 <span class="badge bg-primary">Biru = Lolos</span>
                 <span class="badge bg-warning text-dark">Kuning = Tereliminasi</span>
-            </div>
-
-            <!-- Filter Form -->
-
-
-            <!-- Lolos -->
-            <h4 class="text-success">Lolos</h4>
+            </div> -->
+            <div style="margin-top: 50px;"></div>
+            <!-- Tabel 1: Hasil Analisa Kualitatif -->
+            <h4 class="mt-4">Tabel Hasil Analisa (Kualitatif)</h4>
             <div class="table-responsive mb-4">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
+                <table id="tabelKualitatif" class="table table-bordered align-middle display">
+                    <thead class="table-primary">
                         <tr>
-                            <th>No</th>
-                            <th>NIK</th>
                             <th>Nama</th>
-                            <th>Nilai SAW</th>
-                            <th>Ranking</th>
-                        </tr>
-                    </thead>
-                    <tbody x-data="{ showAll: false }">
-                        @forelse ($lolos as $index => $row)
-                        @php
-                        $warna = $row['rank'] <= 4 ? 'bg-success text-white' : 'bg-primary text-white' ;
-                            @endphp
-
-                            <tr x-show="showAll || {{ $index < 10 ? 'true' : 'false' }}">
-                            <td>{{ $loop->iteration }}</td>
-                            <td class="{{ $warna }}">{{ $row['alternatif_nik'] }}</td>
-                            <td class="{{ $warna }}">{{ $row['nama'] }}</td>
-                            <td class="{{ $warna }}">{{ number_format($row['nilai_akhir'], 4) }}</td>
-                            <td class="{{ $warna }}">{{ $row['rank'] }}</td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="5" class="text-center">Tidak ada data lolos.</td>
-                            </tr>
-                            @endforelse
-
-                            @if ($lolos->count() > 10)
-                            <tr x-show="!showAll">
-                                <td colspan="5" class="text-center">
-                                    <button @click="showAll = true" class="btn btn-sm btn-outline-primary mt-2">
-                                        Tampilkan Semua
-                                    </button>
-                                </td>
-                            </tr>
-                            @endif
-                    </tbody>
-                </table>
-                {{-- {{ $lolos->appends(request()->query())->links() }} --}}
-            </div>
-
-            <!-- Eliminasi -->
-            <h4 class="text-warning">Tereliminasi</h4>
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>NIK</th>
-                            <th>Nama</th>
-                            <th>Nilai SAW</th>
-                            <th>Ranking</th>
+                            @foreach ($kriterias as $k)
+                            <th>{{ $k->nama }}</th>
+                            @endforeach
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($eliminasi as $index => $row)
+                        @foreach ($analisa_kualitatif as $row)
                         <tr>
-                            <td>{{ $eliminasi->firstItem() + $index }}</td>
-                            <td class="bg-warning text-dark">{{ $row['alternatif_nik'] }}</td>
-                            <td class="bg-warning text-dark">{{ $row['nama'] }}</td>
-                            <td class="bg-warning text-dark">{{ number_format($row['nilai_akhir'], 4) }}</td>
-                            <td class="bg-warning text-dark">{{ $row['rank'] }}</td>
+                            <td>{{ $row['nama'] }}</td>
+                            @foreach ($kriterias as $k)
+                            <td>{{ $row[$k->kode_kriteria] ?? '-' }}</td>
+                            @endforeach
                         </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="text-center">Tidak ada data tereliminasi.</td>
-                        </tr>
-                        @endforelse
+                        @endforeach
                     </tbody>
                 </table>
-                {{-- {{ $eliminasi->appends(request()->query())->links() }} --}}
+            </div>
+            <div class="table-responsive mb-4">
+                <table id="tabelSkoring" class="table table-bordered align-middle display">
+                    <thead class="table-light">
+                        <tr>
+                            <th>NIK</th>
+                            @foreach ($kriterias as $k)
+                            <th>{{ $k->kode_kriteria }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($skoring_kuantitatif as $row)
+                        <tr>
+                            <td>{{ $row['nik'] }}</td>
+                            @foreach ($kriterias as $k)
+                            <td>{{ $row[$k->kode_kriteria] ?? 0 }}</td>
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
+            <!-- Tabel Normalisasi -->
+            <h4 class="mt-4">Tabel Normalisasi</h4>
+            <div class="table-responsive mb-4">
+                <table id="normalisasiTable" class="table table-bordered display">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Kode Alternatif</th>
+                            @foreach ($kriterias as $k)
+                            <th>{{ $k->kode_kriteria }}</th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($normalisasi as $row)
+                        <tr>
+                            <td>{{ $row['nik'] }}</td>
+                            @foreach ($kriterias as $k)
+                            <td>{{ $row[$k->kode_kriteria] ?? 0 }}</td>
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <!-- Tabel Perangkingan -->
+            <h4 class="mt-4">Tabel Perangkingan</h4>
+            <div class="table-responsive mb-4">
+                <table id="perangkinganTable" class="table table-bordered display">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Nama Alternatif</th>
+                            @foreach ($kriterias as $k)
+                            <th>{{ $k->nama }}</th>
+                            @endforeach
+                            <th>Total</th>
+                            <th>Rank</th>
+                        </tr>
+                        <tr>
+                            <th>Bobot</th>
+                            @foreach ($kriterias as $k)
+                            <th>{{ $k->weight }}</th>
+                            @endforeach
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($perangkingan as $row)
+                        <tr>
+                            <td>{{ $alternatifs->where('nik', $row['nik'])->first()->nama ?? $row['nik'] }}</td>
+                            @foreach ($kriterias as $k)
+                            <td>{{ $row[$k->kode_kriteria] ?? 0 }}</td>
+                            @endforeach
+                            <td><strong>{{ $row['total'] }}</strong></td>
+                            <td>{{ $row['rank'] }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var table1 = $('#tabelKualitatif').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+        }); // Ini yang aktif filter & pagination
+        var table2 = $('#tabelSkoring').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+            paging: false, // Nonaktifkan paging di sini
+            searching: false, // Nonaktifkan search di sini
+            info: false
+        });
+
+        // Sinkronisasi pagination dan jumlah entries (jika mau)
+        function syncSkoringTable() {
+            var pageInfo = table1.page.info();
+            var start = pageInfo.start;
+            var end = pageInfo.end;
+
+            var table2FilteredData = table2.rows({
+                search: 'applied'
+            }).data().toArray();
+            var slicedData = table2FilteredData.slice(start, end);
+
+            var tbody = $('#tabelSkoring tbody');
+            tbody.empty();
+            slicedData.forEach(function(row) {
+                var tr = '<tr>';
+                row.forEach(function(cell) {
+                    tr += '<td>' + cell + '</td>';
+                });
+                tr += '</tr>';
+                tbody.append(tr);
+            });
+        }
+
+        table1.on('draw', syncSkoringTable);
+        syncSkoringTable(); // <-- panggil langsung di awal
+
+        $('#normalisasiTable').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100]
+        });
+        $('#perangkinganTable').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+        });
+        $('#lolosTable').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+        });
+        $('#eliminasiTable').DataTable({
+            lengthMenu: [5, 10, 25, 50, 100],
+        });
+    });
+</script>
 @endsection
